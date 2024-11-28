@@ -1,0 +1,44 @@
+[
+  {
+    "objectID": "ipsum.html",
+    "href": "ipsum.html",
+    "title": "2  Demographic data from census 2019",
+    "section": "",
+    "text": "3 Age pyramid\nThe wealth asset index was constructed by principal components analysis (PCA) using information on the ownership of dwelling, water supply, air condition, computer, washer, refrigerator, tv, radio, electricity, hot water, phone that are related to the household’s wealth. Follow https://pmc.ncbi.nlm.nih.gov/articles/PMC5348557/ and https://rpubs.com/Sternonyos/526030\nlibrary(psych)\n\ndf$ownership &lt;- ifelse(df$OWNERSHIP == 1,1,0)\ndf$watsup &lt;- ifelse(df$WATSUP == 10,1,0)\ndf$aircon &lt;- ifelse(df$AIRCON == 10,0,1)\ndf$computer &lt;- ifelse(df$COMPUTER == 2,1,0)\ndf$washer &lt;- ifelse(df$WASHER == 2,1,0)\ndf$refrig &lt;- ifelse(df$REFRIG == 2,1,0)\ndf$tv &lt;- ifelse(df$TV == 20,1,0)\ndf$radio &lt;- ifelse(df$RADIO == 2,1,0)\ndf$electric &lt;- ifelse(df$ELECTRIC == 1,1,0)\ndf$hotwater &lt;- ifelse(df$HOTWATER == 2,1,0)\ndf$phone &lt;- ifelse(df$PHONE == 2,1,0)\n\nwealth_index &lt;- df[,c(\"qh\",\"ownership\",\"watsup\",\"aircon\",\"computer\",\n                      \"washer\",\"refrig\",\"tv\",\"radio\",\"electric\",\n                      \"hotwater\",\"phone\")] \n\nprn&lt;- principal(wealth_index[,-1], rotate=\"varimax\", \n                      nfactors=3,covar=T, scores=TRUE)\nindex=prn$scores[,1]\nnlab&lt;-c(1,2,3,4,5)\nnewdata&lt;-mutate(wealth_index,\n                quintile=as.factor(cut(index,breaks=5,labels=nlab)))\n\nwealdf &lt;- newdata %&gt;% group_by(qh,quintile) %&gt;% count()\n\nwealdf$quintile &lt;-  case_when(\n  wealdf$quintile == 1 ~ \"Poorest, 20%\",\n  wealdf$quintile == 2 ~ \"Near poor, 20%\",\n  wealdf$quintile == 3 ~ \"Middle, 20%\",\n  wealdf$quintile == 4 ~ \"Richer, 20%\",\n  wealdf$quintile == 5 ~ \"Richest, 20%\") %&gt;% \n  factor(levels = c(\"Poorest, 20%\", \n                    \"Near poor, 20%\",\n                    \"Middle, 20%\",\n                    \"Richer, 20%\",\n                    \"Richest, 20%\")\n  )\n\nwealdf %&gt;% scale_per() %&gt;% \n  ggplot() +\n  geom_col(aes(x = per,\n               y = quintile)) +\n  facet_wrap(vars(qh),\n             # scales = \"free\",\n             ncol = 5)+\n  labs(x = \"Percentage of total population(%)\",\n       y = \"Socioeconomic status (quintile)\")+\n  theme_light()+\n  theme(axis.text.x = element_text(size = 6),\n        axis.text.y = element_text(size = 6))"
+  },
+  {
+    "objectID": "ipsum.html#social-variable",
+    "href": "ipsum.html#social-variable",
+    "title": "2  Demographic data from census 2019",
+    "section": "4.1 Social Variable",
+    "text": "4.1 Social Variable\n\nEducationUran-rural statusNumber of own children under age 5 in householdReligionOwership\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nOwnership of dwelling"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Equity in Vaccine Access in Ho Chi Minh City",
+    "section": "",
+    "text": "Abstract"
+  },
+  {
+    "objectID": "vac_cov.html",
+    "href": "vac_cov.html",
+    "title": "1  Measles vaccine coverage",
+    "section": "",
+    "text": "2 Timely vaccination for each districts by time"
+  },
+  {
+    "objectID": "vac_cov.html#ho-chi-minh-city",
+    "href": "vac_cov.html#ho-chi-minh-city",
+    "title": "1  Measles vaccine coverage",
+    "section": "3.1 Ho Chi Minh City",
+    "text": "3.1 Ho Chi Minh City"
+  },
+  {
+    "objectID": "vac_cov.html#districts",
+    "href": "vac_cov.html#districts",
+    "title": "1  Measles vaccine coverage",
+    "section": "3.2 Districts",
+    "text": "3.2 Districts"
+  }
+]
