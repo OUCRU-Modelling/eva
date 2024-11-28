@@ -1,26 +1,11 @@
----
-title: "Measles vaccine coverage"
-format: 
-  html:
-    page-layout: full
-    toc: true
-    fig-format: svg
-knitr:
-  opts_chunk:
-    out.width: "100%"
-    out.height: "100%"
-editor: visual
-echo: true
-warning: false
-message: false
----
+# Measles vaccine coverage
 
 ```{r}
 library(tidyverse)
 library(lubridate)
 library(janitor)
 Sys.setlocale("LC_TIME", "English")
-df <- readRDS("D:/OUCRU/vac_coverage/data/vaxreg_hcmc_measles.rds")
+df <- readRDS("D:/OUCRU/assigned github/vac_coverage/data/vaxreg_hcmc_measles.rds")
 ```
 
 Vaccine shortage public started in May 2022 [source](https://www.vietnamplus.vn/thanh-pho-ho-chi-minh-het-vaccine-trong-chuong-trinh-tiem-chung-mo-rong-post909241.vnp#google_vignette)
@@ -176,3 +161,7 @@ final2 <- ggplot(data = cov_df2,aes(x = date,y = coverage*100))+
 final2 + 
   ggtitle("Vaccine coverage by districts of children (5m-5y) who get vaccinated two doses from Sep 2022-Nov 2024")
 ```
+
+
+
+

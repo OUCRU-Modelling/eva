@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "vac_cov.html",
+    "href": "vac_cov.html",
+    "title": "1  Measles vaccine coverage",
+    "section": "",
+    "text": "2 Timely vaccination for each districts by time"
+  },
+  {
+    "objectID": "vac_cov.html#ho-chi-minh-city",
+    "href": "vac_cov.html#ho-chi-minh-city",
+    "title": "1  Measles vaccine coverage",
+    "section": "3.1 Ho Chi Minh City",
+    "text": "3.1 Ho Chi Minh City"
+  },
+  {
+    "objectID": "vac_cov.html#districts",
+    "href": "vac_cov.html#districts",
+    "title": "1  Measles vaccine coverage",
+    "section": "3.2 Districts",
+    "text": "3.2 Districts"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Equity in Vaccine Access in Ho Chi Minh City",
+    "section": "",
+    "text": "Abstract"
+  },
+  {
+    "objectID": "index.html#age-pyramid",
+    "href": "index.html#age-pyramid",
+    "title": "Equity in Vaccine Access in Ho Chi Minh City",
+    "section": "1.1 Age pyramid",
+    "text": "1.1 Age pyramid\n\nCensus 2019IPSUM 2019"
+  },
+  {
+    "objectID": "index.html#population-density",
+    "href": "index.html#population-density",
+    "title": "Equity in Vaccine Access in Ho Chi Minh City",
+    "section": "1.2 Population Density",
+    "text": "1.2 Population Density\n\nHCMC Population Density 2019Data\n\n\n\n\n\n\n\n\n\n\n\n     District Population Area(km^2) Population Density\n1           1     161975       7.72         20981.2176\n2          10     239944       5.72         41948.2517\n3          11     212448       5.14         41332.2957\n4          12     489271      52.74          9277.0383\n5           3     199914       4.92         40632.9268\n6           4     174448       4.18         41733.9713\n7           5     175828       4.27         41177.5176\n8           6     261785       7.14         36664.5658\n9           7     343530      35.69          9625.3853\n10          8     403282      19.11         21103.1920\n11 binh chanh     508490     252.56          2013.3434\n12   binh tan     622294      52.02         11962.5913\n13 binh thanh     515770      20.78         24820.5005\n14    can gio      78240     704.45           111.0654\n15     cu chi     419260     434.77           964.3260\n16     go vap     664746      19.73         33692.1439\n17    hoc mon     417053     109.17          3820.2162\n18     nha be     119588     100.43          1190.7597\n19  phu nhuan     182878       4.88         37475.0000\n20   tan binh     395784      22.43         17645.2965\n21    tan phu     516513      15.97         32342.7051\n22    thu duc     965772     211.56          4565.0028\n\n\n\n\n\n\n1.2.1 Social Variable\n\nEducationUran-rural statusNumber of own children under age 5 in householdReligionOwership\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nOwnership of dwelling"
+  },
+  {
+    "objectID": "index.html#economic-variable",
+    "href": "index.html#economic-variable",
+    "title": "Equity in Vaccine Access in Ho Chi Minh City",
+    "section": "1.3 Economic variable",
+    "text": "1.3 Economic variable\nThe wealth asset index was constructed by principal components analysis (PCA) using information on the ownership of dwelling, water supply, air condition, computer, washer, refrigerator, tv, radio, electricity, hot water, phone that are related to the household’s wealth. Follow https://pmc.ncbi.nlm.nih.gov/articles/PMC5348557/ and https://rpubs.com/Sternonyos/526030\n\nlibrary(psych)\n\ndf$ownership &lt;- ifelse(df$OWNERSHIP == 1,1,0)\ndf$watsup &lt;- ifelse(df$WATSUP == 10,1,0)\ndf$aircon &lt;- ifelse(df$AIRCON == 10,0,1)\ndf$computer &lt;- ifelse(df$COMPUTER == 2,1,0)\ndf$washer &lt;- ifelse(df$WASHER == 2,1,0)\ndf$refrig &lt;- ifelse(df$REFRIG == 2,1,0)\ndf$tv &lt;- ifelse(df$TV == 20,1,0)\ndf$radio &lt;- ifelse(df$RADIO == 2,1,0)\ndf$electric &lt;- ifelse(df$ELECTRIC == 1,1,0)\ndf$hotwater &lt;- ifelse(df$HOTWATER == 2,1,0)\ndf$phone &lt;- ifelse(df$PHONE == 2,1,0)\n\nwealth_index &lt;- df[,c(\"qh\",\"ownership\",\"watsup\",\"aircon\",\"computer\",\n                      \"washer\",\"refrig\",\"tv\",\"radio\",\"electric\",\n                      \"hotwater\",\"phone\")] \n\nprn&lt;- principal(wealth_index[,-1], rotate=\"varimax\", \n                      nfactors=3,covar=T, scores=TRUE)\nindex=prn$scores[,1]\nnlab&lt;-c(1,2,3,4,5)\nnewdata&lt;-mutate(wealth_index,\n                quintile=as.factor(cut(index,breaks=5,labels=nlab)))\n\nwealdf &lt;- newdata %&gt;% group_by(qh,quintile) %&gt;% count()\n\nwealdf$quintile &lt;-  case_when(\n  wealdf$quintile == 1 ~ \"Poorest, 20%\",\n  wealdf$quintile == 2 ~ \"Near poor, 20%\",\n  wealdf$quintile == 3 ~ \"Middle, 20%\",\n  wealdf$quintile == 4 ~ \"Richer, 20%\",\n  wealdf$quintile == 5 ~ \"Richest, 20%\") %&gt;% \n  factor(levels = c(\"Poorest, 20%\", \n                    \"Near poor, 20%\",\n                    \"Middle, 20%\",\n                    \"Richer, 20%\",\n                    \"Richest, 20%\")\n  )\n\nwealdf %&gt;% scale_per() %&gt;% \n  ggplot() +\n  geom_col(aes(x = per,\n               y = quintile)) +\n  facet_wrap(vars(qh),\n             # scales = \"free\",\n             ncol = 5)+\n  labs(x = \"Percentage of total population(%)\",\n       y = \"Socioeconomic status (quintile)\")+\n  theme_light()+\n  theme(axis.text.x = element_text(size = 6),\n        axis.text.y = element_text(size = 6))"
+  },
+  {
+    "objectID": "index.html#social-variable",
+    "href": "index.html#social-variable",
+    "title": "Equity in Vaccine Access in Ho Chi Minh City",
+    "section": "3.1 Social Variable",
+    "text": "3.1 Social Variable\n\nEducationUran-rural statusNumber of own children under age 5 in householdReligionOwership\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nOwnership of dwelling"
+  },
+  {
+    "objectID": "ipsum.html",
+    "href": "ipsum.html",
+    "title": "2  Demographic data from census 2019",
+    "section": "",
+    "text": "3 Age pyramid\nThe wealth asset index was constructed by principal components analysis (PCA) using information on the ownership of dwelling, water supply, air condition, computer, washer, refrigerator, tv, radio, electricity, hot water, phone that are related to the household’s wealth. Follow https://pmc.ncbi.nlm.nih.gov/articles/PMC5348557/ and https://rpubs.com/Sternonyos/526030\nlibrary(psych)\n\ndf$ownership &lt;- ifelse(df$OWNERSHIP == 1,1,0)\ndf$watsup &lt;- ifelse(df$WATSUP == 10,1,0)\ndf$aircon &lt;- ifelse(df$AIRCON == 10,0,1)\ndf$computer &lt;- ifelse(df$COMPUTER == 2,1,0)\ndf$washer &lt;- ifelse(df$WASHER == 2,1,0)\ndf$refrig &lt;- ifelse(df$REFRIG == 2,1,0)\ndf$tv &lt;- ifelse(df$TV == 20,1,0)\ndf$radio &lt;- ifelse(df$RADIO == 2,1,0)\ndf$electric &lt;- ifelse(df$ELECTRIC == 1,1,0)\ndf$hotwater &lt;- ifelse(df$HOTWATER == 2,1,0)\ndf$phone &lt;- ifelse(df$PHONE == 2,1,0)\n\nwealth_index &lt;- df[,c(\"qh\",\"ownership\",\"watsup\",\"aircon\",\"computer\",\n                      \"washer\",\"refrig\",\"tv\",\"radio\",\"electric\",\n                      \"hotwater\",\"phone\")] \n\nprn&lt;- principal(wealth_index[,-1], rotate=\"varimax\", \n                      nfactors=3,covar=T, scores=TRUE)\nindex=prn$scores[,1]\nnlab&lt;-c(1,2,3,4,5)\nnewdata&lt;-mutate(wealth_index,\n                quintile=as.factor(cut(index,breaks=5,labels=nlab)))\n\nwealdf &lt;- newdata %&gt;% group_by(qh,quintile) %&gt;% count()\n\nwealdf$quintile &lt;-  case_when(\n  wealdf$quintile == 1 ~ \"Poorest, 20%\",\n  wealdf$quintile == 2 ~ \"Near poor, 20%\",\n  wealdf$quintile == 3 ~ \"Middle, 20%\",\n  wealdf$quintile == 4 ~ \"Richer, 20%\",\n  wealdf$quintile == 5 ~ \"Richest, 20%\") %&gt;% \n  factor(levels = c(\"Poorest, 20%\", \n                    \"Near poor, 20%\",\n                    \"Middle, 20%\",\n                    \"Richer, 20%\",\n                    \"Richest, 20%\")\n  )\n\nwealdf %&gt;% scale_per() %&gt;% \n  ggplot() +\n  geom_col(aes(x = per,\n               y = quintile)) +\n  facet_wrap(vars(qh),\n             # scales = \"free\",\n             ncol = 5)+\n  labs(x = \"Percentage of total population(%)\",\n       y = \"Socioeconomic status (quintile)\")+\n  theme_light()+\n  theme(axis.text.x = element_text(size = 6),\n        axis.text.y = element_text(size = 6))"
+  },
+  {
+    "objectID": "ipsum.html#social-variable",
+    "href": "ipsum.html#social-variable",
+    "title": "2  Demographic data from census 2019",
+    "section": "4.1 Social Variable",
+    "text": "4.1 Social Variable\n\nEducationUran-rural statusNumber of own children under age 5 in householdReligionOwership\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nOwnership of dwelling"
+  }
+]

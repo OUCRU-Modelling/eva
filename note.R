@@ -2,6 +2,8 @@ library(tidyverse)
 library(lubridate)
 library(janitor)
 Sys.setlocale("LC_TIME", "English")
+
+
 df <- readRDS("D:/OUCRU/vac_coverage/data/vaxreg_hcmc_measles.rds")
 
 ## https://www.vietnamplus.vn/thanh-pho-ho-chi-minh-het-vaccine-trong-chuong-trinh-tiem-chung-mo-rong-post909241.vnp#google_vignette
@@ -179,13 +181,102 @@ ggplot(data = out_timely,aes(x = date,y = per*100))+
   theme(axis.text.x = element_text(angle = 45,size = 8,
                                    hjust=1))
 
+## compare with demographic data
+
+meandf <- out_timely %>% group_by(district) %>% 
+  summarise(mean = mean(per)) 
+
+sorted <- meandf[order(-meandf$mean),]  
+
+s_dis <- sorted$district
+
+sorted %>% as.data.frame()
+
+sorted %>% 
+  ggplot(aes(x = mean*100,y = dis))+
+  geom_bar(stat = "identity")+
+  scale_x_continuous(breaks = seq(0,100,10),limits = c(0,100))+
+  labs(x = "Timely vaccination percentage",y = "District")
+
+sorted %>% order(-sorted$mean)
+
+###
+
+# IPSUM
+library(stringi)
+df <- readRDS("D:/OUCRU/IPSUM/ipumsi_hcmc_2019.rds")
+
+df$qh <- case_when(
+  df$GEO2_VN == 704079760 ~ "Quận 1",
+  df$GEO2_VN == 704079761 ~ "Quận 12",
+  df$GEO2_VN == 704079762 ~ "Thủ Đức",
+  df$GEO2_VN == 704079763 ~ "Thủ Đức",
+  df$GEO2_VN == 704079764 ~ "Gò Vấp",
+  df$GEO2_VN == 704079765 ~ "Bình Thạnh",
+  df$GEO2_VN == 704079766 ~ "Tân Bình",
+  df$GEO2_VN == 704079767 ~ "Tân Phú",
+  df$GEO2_VN == 704079768 ~ "Phú Nhuận",
+  df$GEO2_VN == 704079769 ~ "Thủ Đức",
+  df$GEO2_VN == 704079770 ~ "Quận 3",
+  df$GEO2_VN == 704079771 ~ "Quận 10",
+  df$GEO2_VN == 704079772 ~ "Quận 11",
+  df$GEO2_VN == 704079773 ~ "Quận 4",
+  df$GEO2_VN == 704079774 ~ "Quận 5",
+  df$GEO2_VN == 704079775 ~ "Quận 6",
+  df$GEO2_VN == 704079776 ~ "Quận 8",
+  df$GEO2_VN == 704079777 ~ "Bình Tân", 
+  df$GEO2_VN == 704079778 ~ "Quận 7",
+  df$GEO2_VN == 704079783 ~ "Củ Chi",
+  df$GEO2_VN == 704079784 ~ "Hóc Môn",
+  df$GEO2_VN == 704079785 ~ "Bình Chánh",
+  df$GEO2_VN == 704079786 ~ "Nhà Bè",
+  df$GEO2_VN == 704079787 ~ "Cần Giờ") %>% 
+  stri_trans_general("latin-ascii") %>%
+  str_remove_all("Quan") %>% 
+  trimws(which = "both")
 
 
+df$agr = df$AGE2 %>% as.factor()
+
+levels(df$agr) = c("0-4", "5-9", "10-14","15-19",
+                   "20-24","25-29","30-34","35-39",
+                   "40-44","45-49","50-54","55-59",
+                   "60-64","65-69","70-74","75-79",
+                   "80-84","85+")
+
+df$sex <- ifelse(df$SEX == 1,"male","female")
 
 
+agepyr <- df[,c("agr","sex","qh")] %>% group_by(qh,agr,sex) %>% count()
 
 
+agepyr <- agepyr %>% mutate(
+  population2 = case_when(
+    sex == "female" ~ -n,
+    TRUE ~ n
+  )) %>% as.data.frame()
 
+
+pop_range <- range(agepyr$population2 %>% na.omit())
+pop_range_breaks1 <- pretty(pop_range, n = 10)
+
+agepyr %>% 
+  ggplot() +
+  geom_col(aes(x = population2,
+               y = agr,
+               fill = sex)) +
+  # geom_col(aes(x = population2.y,
+  #              y = agr,
+  #              fill = sex),alpha=0.5) +
+  scale_x_continuous(breaks  = pop_range_breaks1,
+                     labels = abs(pop_range_breaks1))+
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  theme_light()+
+  labs(x = "Population",y = "Age group")+
+  theme(axis.text.x = element_text(size = 4.5),
+        axis.text.y = element_text(size = 4))
 
 
 

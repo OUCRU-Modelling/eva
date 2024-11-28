@@ -1,0 +1,461 @@
+# Demographic data from census 2019
+
+```{r}
+library(tidyverse)
+library(stringi)
+```
+
+# Age pyramid
+
+```{r}
+# IPSUM
+df <- readRDS("D:/OUCRU/IPSUM/ipumsi_hcmc_2019.rds")
+
+df$qh <- case_when(
+  df$GEO2_VN == 704079760 ~ "Quận 1",
+  df$GEO2_VN == 704079761 ~ "Quận 12",
+  df$GEO2_VN == 704079762 ~ "Thủ Đức",
+  df$GEO2_VN == 704079763 ~ "Thủ Đức",
+  df$GEO2_VN == 704079764 ~ "Gò Vấp",
+  df$GEO2_VN == 704079765 ~ "Bình Thạnh",
+  df$GEO2_VN == 704079766 ~ "Tân Bình",
+  df$GEO2_VN == 704079767 ~ "Tân Phú",
+  df$GEO2_VN == 704079768 ~ "Phú Nhuận",
+  df$GEO2_VN == 704079769 ~ "Thủ Đức",
+  df$GEO2_VN == 704079770 ~ "Quận 3",
+  df$GEO2_VN == 704079771 ~ "Quận 10",
+  df$GEO2_VN == 704079772 ~ "Quận 11",
+  df$GEO2_VN == 704079773 ~ "Quận 4",
+  df$GEO2_VN == 704079774 ~ "Quận 5",
+  df$GEO2_VN == 704079775 ~ "Quận 6",
+  df$GEO2_VN == 704079776 ~ "Quận 8",
+  df$GEO2_VN == 704079777 ~ "Bình Tân", 
+  df$GEO2_VN == 704079778 ~ "Quận 7",
+  df$GEO2_VN == 704079783 ~ "Củ Chi",
+  df$GEO2_VN == 704079784 ~ "Hóc Môn",
+  df$GEO2_VN == 704079785 ~ "Bình Chánh",
+  df$GEO2_VN == 704079786 ~ "Nhà Bè",
+  df$GEO2_VN == 704079787 ~ "Cần Giờ") %>% 
+  stri_trans_general("latin-ascii") %>%
+  str_remove_all("Quan") %>% 
+  trimws(which = "both")
+
+
+df$agr = df$AGE2 %>% as.factor()
+
+levels(df$agr) = c("0-4", "5-9", "10-14","15-19",
+                   "20-24","25-29","30-34","35-39",
+                   "40-44","45-49","50-54","55-59",
+                   "60-64","65-69","70-74","75-79",
+                   "80-84","85+")
+
+df$sex <- ifelse(df$SEX == 1,"male","female")
+
+
+agepyr <- df[,c("agr","sex","qh")] %>% group_by(qh,agr,sex) %>% count()
+
+
+agepyr <- agepyr %>% mutate(
+  population2 = case_when(
+    sex == "female" ~ -n,
+    TRUE ~ n
+  )) %>% as.data.frame()
+```
+
+```{r}
+## CENSUS 2019
+hcm19 <- readRDS("D:/OUCRU/hfmd/data/census2019.rds") %>% 
+  filter(province == "Thành phố Hồ Chí Minh")
+
+hcm19$district <- hcm19$district %>%
+  str_remove_all("Quận|Huyện") %>%
+  str_replace_all(
+    c("\\b2\\b|\\b9\\b"  = "Thủ Đức")) %>%
+  stri_trans_general("latin-ascii") %>% 
+  trimws(which = "both")
+
+
+hcm19$age2 <- as.numeric(word(hcm19$age, 1))
+
+
+hcm19$agr <- as.factor(cut(as.numeric(hcm19$age2), 
+              c(0,4, 9, 14,19,24,29,34,39,44,49,54,59,64,69,74,79,84,Inf), 
+              right=TRUE ))
+
+levels(hcm19$agr) = c("0-4", "5-9", "10-14","15-19",
+                   "20-24","25-29","30-34","35-39",
+                   "40-44","45-49","50-54","55-59",
+                   "60-64","65-69","70-74","75-79",
+                   "80-84","85+")
+
+
+agr_hcm19 <- hcm19 %>% group_by(district,agr,sex) %>% summarise(n = sum(n))
+
+agr_hcm19 <- agr_hcm19 %>% mutate(
+  population2 = case_when(
+    sex == "female" ~ -n,
+    TRUE ~ n
+  ))
+
+```
+
+::: {.panel-tabset .nav-pills}
+## Census 2019
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+hcm_para <- full_join(agepyr,agr_hcm19,by = c("qh" = "district",
+                                  "agr"="agr",
+                                  "sex"="sex")) 
+pop_range <- range(hcm_para$population2.y %>% na.omit())
+
+pop_range_breaks <- pretty(pop_range, n = 6)
+
+hcm_para %>% 
+ggplot() +
+  geom_col(aes(x = population2.x,
+               y = agr,
+               fill = sex)) +
+  geom_col(aes(x = population2.y,
+               y = agr,
+               fill = sex),alpha=0.5) +
+  scale_x_continuous(breaks  = pop_range_breaks,
+                     labels = abs(pop_range_breaks))+
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  theme_light()+
+  labs(x = "Population",y = "Age group")+
+  theme(axis.text.x = element_text(size = 4.5),
+        axis.text.y = element_text(size = 4))
+```
+
+## IPSUM 2019
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+
+pop_range_breaks1 <- pretty(pop_range*0.085, n = 10)
+
+hcm_para %>% 
+ggplot() +
+  geom_col(aes(x = population2.x,
+               y = agr,
+               fill = sex)) +
+  # geom_col(aes(x = population2.y,
+  #              y = agr,
+  #              fill = sex),alpha=0.5) +
+  scale_x_continuous(breaks  = pop_range_breaks1,
+                     labels = abs(pop_range_breaks1))+
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  theme_light()+
+  labs(x = "Population",y = "Age group")+
+  theme(axis.text.x = element_text(size = 4.5),
+        axis.text.y = element_text(size = 4))
+```
+:::
+
+# Population Density
+
+::: {.panel-tabset .nav-pills}
+# HCMC Population Density 2019
+
+```{r,results='hide'}
+popden <- hcm19 %>% group_by(district) %>% 
+  summarise(n = sum(n)) %>% 
+  mutate(dt = c(7.72,5.72,5.14,52.74,4.92,
+                4.18,4.27,7.14,35.69,19.11,
+                252.56,52.02,20.78,704.45,434.77,
+                19.73,109.17,100.43,4.88,22.43,
+                15.97,211.56),
+         popden = n/dt) %>% 
+  as.data.frame()
+
+popden$district <- popden$district %>% 
+  tolower()
+
+library(sf)
+library(janitor)
+map_path <- "D:/OUCRU/HCDC/project phân tích sero quận huyện/"
+
+vn_qh <- st_read(dsn = file.path(map_path,"gadm41_VNM.gpkg"), layer = "ADM_ADM_2")
+
+vn_qh1 <- vn_qh %>%
+  clean_names() %>%     ## cho thành chữ thường
+  filter(
+    str_detect(
+      name_1,
+      "Hồ Chí Minh"
+    )
+  )
+
+qhtp <- vn_qh1[-c(14,21),]
+
+
+qhtp$geom[qhtp$varname_2 == "Thu Duc"] <- vn_qh1[c("21","24","14"),] %>%
+  st_union()
+
+qhtp <- qhtp %>% st_cast("MULTIPOLYGON")
+
+qhtp$varname_2 <- stri_trans_general(qhtp$varname_2, "latin-ascii") %>%
+  tolower() %>%
+  str_remove("district") %>%
+  trimws(which = "both")
+
+qhtp$name_2 <- qhtp$name_2 %>% 
+  str_remove("Quận|Huyện") %>%
+  trimws(which = "both")
+qhtp$nl_name_2 <- c("BC","BTân","BT","CG","CC","GV",
+                    "HM","NB","PN","1","10","11","12"
+                    ,"3","4","5","6","7","8","TB",
+                    "TP","TĐ")
+
+dfp <- left_join(qhtp,popden, by = join_by(varname_2 == district))
+
+dfp %>% ggplot() +
+  geom_sf(aes(fill = popden),show.legend = T)+
+  scale_fill_continuous(low="yellow", high="red",
+                        guide="colorbar",na.value="white",
+                        name = "Population density")+
+   geom_sf_text(aes(label = nl_name_2), size = 1.5)+
+  theme_void()
+```
+
+# Data
+
+```{r}
+colnames(popden) <- c("District","Population","Area(km^2)","Population Density")
+popden
+```
+:::
+
+## Social Variable
+
+```{r}
+popdis <- hcm19 %>% group_by(district) %>% 
+    summarise(n = sum(n))
+district <- popdis$district
+## function to scale per
+scale_per <- function(data){
+  ou <- data.frame()
+  for (i in 1:22){
+    oo <- data %>% filter(qh == district[i]) %>% 
+      mutate(pop = rep(as.numeric(popdis$n[popdis$district == district[i]])),
+             per = (n/pop)*100)
+    ou <- rbind(ou,oo)
+  }
+  return(ou)
+}
+```
+
+::: {.panel-tabset .nav-pills}
+## Education
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+df$edu <-  case_when(
+  df$EDATTAIN == 0 ~ "NIU",
+  df$EDATTAIN == 1 ~ "Less than primary completed",
+  df$EDATTAIN == 2 ~ "Primary completed",
+  df$EDATTAIN == 3 ~ "Secondary completed",
+  df$EDATTAIN == 4 ~ "University completed") %>% 
+  
+  factor(levels = c("NIU", 
+             "Less than primary completed", 
+             "Primary completed", 
+             "Secondary completed", 
+             "University completed")
+)
+
+hcm_edu <- df %>% group_by(qh,edu) %>% count()
+
+scale_per(hcm_edu) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = edu)) +
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))  
+```
+
+## Uran-rural status
+
+```{r}
+df$urban <- ifelse(df$URBAN == 2,"Urban","Rural")
+urban <- df %>% group_by(qh,urban) %>% count() 
+scale_per(urban) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = urban)) +
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))  
+```
+
+## Number of own children under age 5 in household
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+hcm_chil5 <- df %>% group_by(qh,NCHLT5) %>% count()
+
+scale_per(hcm_chil5) %>%
+  # filter(NCHLT5 != 0) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(NCHLT5))) +
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Number of own children under age 5 in household")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))  
+```
+
+## Religion
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+df$reli <-  case_when(
+  df$RELIGION == 1 ~ "No religion",
+  df$RELIGION == 2 ~ "Buddhist",
+  df$RELIGION == 5 ~ "Muslim",
+  df$RELIGION == 6 ~ "Christian",
+  df$RELIGION == 7 ~ "Other") 
+# %>% 
+#   factor(levels = c("NIU", 
+#                     "Less than primary completed", 
+#                     "Primary completed", 
+#                     "Secondary completed", 
+#                     "University completed"))
+
+hcm_reli <- df %>% group_by(qh,reli) %>% count()
+
+scale_per(hcm_reli) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(reli))) +
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Religion")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))  
+
+```
+
+## Owership
+
+Ownership of dwelling
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+df$owner <-  case_when(
+  df$OWNERSHIPD == 0 ~ "NIU",
+  df$OWNERSHIPD == 100 ~ "Owned",
+  df$OWNERSHIPD == 214 ~ "Renting, private",
+  df$OWNERSHIPD == 211 ~ "Renting, government",
+  df$OWNERSHIPD == 217 ~ "Renting, collective",
+  df$OWNERSHIPD == 290 ~ "Not owned, other") 
+owner <- df %>% group_by(qh,owner) %>% count() 
+scale_per(owner) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = owner)) +
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))  
+
+```
+:::
+
+# Economic variable
+
+The wealth asset index was constructed by principal components analysis (PCA) using information on the ownership of dwelling, water supply, air condition, computer, washer, refrigerator, tv, radio, electricity, hot water, phone that are related to the household’s wealth. Follow <https://pmc.ncbi.nlm.nih.gov/articles/PMC5348557/> and <https://rpubs.com/Sternonyos/526030>
+
+```{r,echo = TRUE}
+library(psych)
+
+df$ownership <- ifelse(df$OWNERSHIP == 1,1,0)
+df$watsup <- ifelse(df$WATSUP == 10,1,0)
+df$aircon <- ifelse(df$AIRCON == 10,0,1)
+df$computer <- ifelse(df$COMPUTER == 2,1,0)
+df$washer <- ifelse(df$WASHER == 2,1,0)
+df$refrig <- ifelse(df$REFRIG == 2,1,0)
+df$tv <- ifelse(df$TV == 20,1,0)
+df$radio <- ifelse(df$RADIO == 2,1,0)
+df$electric <- ifelse(df$ELECTRIC == 1,1,0)
+df$hotwater <- ifelse(df$HOTWATER == 2,1,0)
+df$phone <- ifelse(df$PHONE == 2,1,0)
+
+wealth_index <- df[,c("qh","ownership","watsup","aircon","computer",
+                      "washer","refrig","tv","radio","electric",
+                      "hotwater","phone")] 
+
+prn<- principal(wealth_index[,-1], rotate="varimax", 
+                      nfactors=3,covar=T, scores=TRUE)
+index=prn$scores[,1]
+nlab<-c(1,2,3,4,5)
+newdata<-mutate(wealth_index,
+                quintile=as.factor(cut(index,breaks=5,labels=nlab)))
+
+wealdf <- newdata %>% group_by(qh,quintile) %>% count()
+
+wealdf$quintile <-  case_when(
+  wealdf$quintile == 1 ~ "Poorest, 20%",
+  wealdf$quintile == 2 ~ "Near poor, 20%",
+  wealdf$quintile == 3 ~ "Middle, 20%",
+  wealdf$quintile == 4 ~ "Richer, 20%",
+  wealdf$quintile == 5 ~ "Richest, 20%") %>% 
+  factor(levels = c("Poorest, 20%", 
+                    "Near poor, 20%",
+                    "Middle, 20%",
+                    "Richer, 20%",
+                    "Richest, 20%")
+  )
+
+wealdf %>% scale_per() %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = quintile)) +
+  facet_wrap(vars(qh),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Socioeconomic status (quintile)")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))  
+```
