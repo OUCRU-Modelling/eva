@@ -304,7 +304,7 @@ scale_per(urban) %>%
              # scales = "free",
              ncol = 5)+
   labs(x = "Percentage of total population(%)",
-       y = "Education")+
+       y = "Urban-rural status")+
   theme_light()+
   theme(axis.text.x = element_text(size = 6),
         axis.text.y = element_text(size = 6))  

@@ -135,7 +135,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Abstract</span></a>
+ <span class="menu-text">Timely vaccination</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -303,6 +303,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="5"><span class="header-section-number">5</span> Economic variable</h1>
 <p>The wealth asset index was constructed by principal components analysis (PCA) using information on the ownership of dwelling, water supply, air condition, computer, washer, refrigerator, tv, radio, electricity, hot water, phone that are related to the household’s wealth. Follow <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5348557/" class="uri">https://pmc.ncbi.nlm.nih.gov/articles/PMC5348557/</a> and <a href="https://rpubs.com/Sternonyos/526030" class="uri">https://rpubs.com/Sternonyos/526030</a></p>
 <div class="cell">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(psych)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>ownership <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>OWNERSHIP <span class="sc">==</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
@@ -355,6 +357,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()<span class="sc">+</span></span>
 <span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">6</span>),</span>
 <span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">6</span>))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="ipsum_files/figure-html/unnamed-chunk-14-1.svg" style="width:100.0%;height:100.0%"></p>
 </div>

@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -102,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Abstract</span></a>
+ <span class="menu-text">Timely vaccination</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -127,12 +161,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#timely-vaccination-for-each-districts-by-time" id="toc-timely-vaccination-for-each-districts-by-time" class="nav-link active" data-scroll-target="#timely-vaccination-for-each-districts-by-time"><span class="header-section-number">2</span> Timely vaccination for each districts by time</a></li>
-  <li><a href="#vaccine-coverage" id="toc-vaccine-coverage" class="nav-link" data-scroll-target="#vaccine-coverage"><span class="header-section-number">3</span> Vaccine coverage</a>
-  <ul class="collapse">
-  <li><a href="#ho-chi-minh-city" id="toc-ho-chi-minh-city" class="nav-link" data-scroll-target="#ho-chi-minh-city"><span class="header-section-number">3.1</span> Ho Chi Minh City</a></li>
-  <li><a href="#districts" id="toc-districts" class="nav-link" data-scroll-target="#districts"><span class="header-section-number">3.2</span> Districts</a></li>
-  </ul></li>
+  <li><a href="#vaccine-coverage-in-ho-chi-minh-city" id="toc-vaccine-coverage-in-ho-chi-minh-city" class="nav-link active" data-scroll-target="#vaccine-coverage-in-ho-chi-minh-city"><span class="header-section-number">2</span> Vaccine coverage in Ho Chi Minh city</a></li>
+  <li><a href="#ipsum-demographic-data" id="toc-ipsum-demographic-data" class="nav-link" data-scroll-target="#ipsum-demographic-data"><span class="header-section-number">3</span> IPSUM (demographic data)</a></li>
   </ul>
 </nav>
     </div>
@@ -157,39 +187,423 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "English_United States.1252"</code></pre>
-</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">Sys.setlocale</span>(<span class="st">"LC_TIME"</span>, <span class="st">"English"</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"D:/OUCRU/assigned github/vac_coverage/data/vaxreg_hcmc_measles.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Vaccine shortage public started in May 2022 <a href="https://www.vietnamplus.vn/thanh-pho-ho-chi-minh-het-vaccine-trong-chuong-trinh-tiem-chung-mo-rong-post909241.vnp#google_vignette">source</a></p>
-<section id="timely-vaccination-for-each-districts-by-time" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Timely vaccination for each districts by time</h1>
 <div class="cell">
-<div class="cell-output-display">
-<p><img src="vac_cov_files/figure-html/unnamed-chunk-3-1.svg" style="width:100.0%;height:100.0%"></p>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>district <span class="ot">&lt;-</span> <span class="fu">unique</span>(df<span class="sc">$</span>district)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>week <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">as.Date</span>(<span class="st">"2022-05-01"</span>),<span class="fu">as.Date</span>(<span class="st">"2024-07-01"</span>),<span class="at">by =</span> <span class="st">"month"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>dttlv <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(<span class="st">"dob"</span>,<span class="st">"district"</span>,<span class="st">"date_m1"</span>,<span class="st">"date_m2"</span>)]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>out_timely <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(district)){</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  td <span class="ot">&lt;-</span> <span class="fu">subset</span>(dttlv, district <span class="sc">==</span> district[k]) </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(week)){</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    td<span class="sc">$</span>lackd <span class="ot">&lt;-</span> week[i]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    td<span class="sc">$</span>ageuntil <span class="ot">&lt;-</span> <span class="fu">interval</span>(td<span class="sc">$</span>dob, td<span class="sc">$</span>lackd) <span class="sc">/</span> <span class="fu">years</span>(<span class="dv">1</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="do">## subset children aged from 9 months to 9 months 2 weeks at chosen time</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    slec <span class="ot">&lt;-</span> td[td<span class="sc">$</span>ageuntil <span class="sc">&gt;=</span> <span class="fl">0.75</span> <span class="sc">&amp;</span> td<span class="sc">$</span>ageuntil <span class="sc">&lt;=</span> <span class="fl">0.75</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span><span class="dv">1</span><span class="sc">/</span><span class="dv">12</span>,]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    slec<span class="sc">$</span>agevac <span class="ot">&lt;-</span> <span class="fu">interval</span>(slec<span class="sc">$</span>dob,slec<span class="sc">$</span>date_m1) <span class="sc">/</span> <span class="fu">years</span>(<span class="dv">1</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    slec<span class="sc">$</span>vac_on_date1 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(slec<span class="sc">$</span>agevac <span class="sc">&lt;</span> slec<span class="sc">$</span>ageuntil <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">12</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    slec<span class="sc">$</span>vac_on_date1 <span class="ot">&lt;-</span> <span class="fu">replace</span>(slec<span class="sc">$</span>vac_on_date, <span class="fu">is.na</span>(slec<span class="sc">$</span>vac_on_date1),<span class="dv">0</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    re <span class="ot">&lt;-</span> slec <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(vac_on_date1) <span class="sc">%&gt;%</span> <span class="fu">count</span>()  </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    cus <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">district =</span> district[k],</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>                      <span class="at">date =</span> week[i],</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                      <span class="at">per =</span> <span class="fu">as.numeric</span>(re[<span class="dv">2</span>,<span class="dv">2</span>])<span class="sc">/</span>(<span class="fu">as.numeric</span>(re[<span class="dv">2</span>,<span class="dv">2</span>])<span class="sc">+</span><span class="fu">as.numeric</span>(re[<span class="dv">1</span>,<span class="dv">2</span>])))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    out_timely <span class="ot">&lt;-</span> <span class="fu">rbind</span>(out_timely,cus)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
+<section id="vaccine-coverage-in-ho-chi-minh-city" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Vaccine coverage in Ho Chi Minh city</h1>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>is_2d <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>is_m1 <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> df<span class="sc">$</span>is_m2 <span class="sc">==</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dfcal <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(<span class="st">"dob"</span>,<span class="st">"is_2d"</span>)]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>date <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">as.Date</span>(<span class="st">"2022-09-01"</span>),<span class="fu">as.Date</span>(<span class="st">"2024-11-20"</span>),<span class="at">by =</span> <span class="st">"month"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>cov_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(date)){</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  dfcal<span class="sc">$</span>trackd <span class="ot">&lt;-</span> date[i]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  dfcal<span class="sc">$</span>ageuntil <span class="ot">&lt;-</span> <span class="fu">interval</span>(dfcal<span class="sc">$</span>dob, dfcal<span class="sc">$</span>trackd) <span class="sc">/</span> <span class="fu">years</span>(<span class="dv">1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  dfcal <span class="ot">&lt;-</span> dfcal[dfcal<span class="sc">$</span>ageuntil <span class="sc">&gt;=</span> <span class="fl">0.75</span> <span class="sc">&amp;</span> dfcal<span class="sc">$</span>ageuntil <span class="sc">&lt;=</span> <span class="dv">5</span>,]</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  ddd <span class="ot">&lt;-</span> dfcal <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(is_2d) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>() </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  ou <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">date =</span> date[i],</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">coverage =</span> <span class="fu">as.numeric</span>(ddd[<span class="dv">2</span>,<span class="dv">2</span>]<span class="sc">/</span>(ddd[<span class="dv">1</span>,<span class="dv">2</span>]<span class="sc">+</span>ddd[<span class="dv">2</span>,<span class="dv">2</span>])))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  cov_df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(cov_df,ou)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>main <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> cov_df,<span class="fu">aes</span>(<span class="at">x =</span> date,<span class="at">y =</span> coverage<span class="sc">*</span><span class="dv">100</span>))<span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">100</span>,<span class="at">by =</span> <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Date"</span>,<span class="at">y =</span> <span class="st">"Vaccine coverage (%)"</span>)<span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">breaks =</span> <span class="st">"2 month"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span> <span class="st">"%b %Y"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits =</span> <span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2022-09-01"</span>),<span class="fu">as.Date</span>(<span class="st">"2024-11-20"</span>)))<span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>,<span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust=</span><span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>sub <span class="ot">&lt;-</span>  <span class="fu">ggplot</span>(<span class="at">data =</span> cov_df,<span class="fu">aes</span>(<span class="at">x =</span> date,<span class="at">y =</span> coverage<span class="sc">*</span><span class="dv">100</span>))<span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,by = 10)) +</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Date"</span>,<span class="at">y =</span> <span class="st">"Vaccine coverage (%)"</span>)<span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">breaks =</span> <span class="st">"2 month"</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span> <span class="st">"%b %Y"</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits =</span> <span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2022-09-01"</span>),<span class="fu">as.Date</span>(<span class="st">"2024-11-20"</span>)))<span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>final1 <span class="ot">&lt;-</span> main <span class="sc">+</span> <span class="fu">annotation_custom</span>(<span class="fu">ggplotGrob</span>(sub),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                         <span class="at">xmin=</span><span class="fu">as.Date</span>(<span class="st">"2023-05-01"</span>), </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                         <span class="at">xmax=</span><span class="fu">as.Date</span>(<span class="st">"2024-11-01"</span>), </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ymin=</span><span class="dv">5</span>, <span class="at">ymax=</span><span class="dv">80</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>final1 <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"Vaccine coverage of children (5m-5y) who get 2-doses vaccinated in Ho Chi Minh City from Sep 2022-Nov 2024"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="vac_cov_files/figure-html/unnamed-chunk-4-1.svg" style="width:100.0%;height:100.0%"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dfcald <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(<span class="st">"dob"</span>,<span class="st">"district"</span>,<span class="st">"is_2d"</span>)]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>cov_df2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(district)){</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fu">subset</span>(dfcald, district <span class="sc">==</span> district[k]) </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(date)){</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    dt<span class="sc">$</span>trackd <span class="ot">&lt;-</span> date[i]</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    dt<span class="sc">$</span>ageuntil <span class="ot">&lt;-</span> <span class="fu">interval</span>(dt<span class="sc">$</span>dob, dt<span class="sc">$</span>trackd) <span class="sc">/</span> <span class="fu">years</span>(<span class="dv">1</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    dt <span class="ot">&lt;-</span> dt[dt<span class="sc">$</span>ageuntil <span class="sc">&gt;=</span> <span class="fl">0.75</span> <span class="sc">&amp;</span> dt<span class="sc">$</span>ageuntil <span class="sc">&lt;=</span> <span class="dv">5</span>,]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    ddd <span class="ot">&lt;-</span> dt <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(is_2d) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">count</span>() </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    ou <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">district =</span> <span class="fu">as.character</span>(district[k]),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">date =</span> date[i],</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">coverage =</span> <span class="fu">as.numeric</span>(ddd[<span class="dv">2</span>,<span class="dv">2</span>]<span class="sc">/</span>(ddd[<span class="dv">1</span>,<span class="dv">2</span>]<span class="sc">+</span>ddd[<span class="dv">2</span>,<span class="dv">2</span>])))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    cov_df2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(cov_df2,ou)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>meancv <span class="ot">&lt;-</span> cov_df2 <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(district) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(coverage)) </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>sorted <span class="ot">&lt;-</span> meancv[<span class="fu">order</span>(<span class="sc">-</span>meancv<span class="sc">$</span>mean),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
-<section id="vaccine-coverage" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Vaccine coverage</h1>
-<section id="ho-chi-minh-city" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="ho-chi-minh-city"><span class="header-section-number">3.1</span> Ho Chi Minh City</h2>
+<section id="ipsum-demographic-data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> IPSUM (demographic data)</h1>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># IPSUM</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"D:/OUCRU/IPSUM/ipumsi_hcmc_2019.rds"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>qh <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079760</span> <span class="sc">~</span> <span class="st">"Quận 1"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079761</span> <span class="sc">~</span> <span class="st">"Quận 12"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079762</span> <span class="sc">~</span> <span class="st">"Thủ Đức"</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079763</span> <span class="sc">~</span> <span class="st">"Thủ Đức"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079764</span> <span class="sc">~</span> <span class="st">"Gò Vấp"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079765</span> <span class="sc">~</span> <span class="st">"Bình Thạnh"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079766</span> <span class="sc">~</span> <span class="st">"Tân Bình"</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079767</span> <span class="sc">~</span> <span class="st">"Tân Phú"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079768</span> <span class="sc">~</span> <span class="st">"Phú Nhuận"</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079769</span> <span class="sc">~</span> <span class="st">"Thủ Đức"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079770</span> <span class="sc">~</span> <span class="st">"Quận 3"</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079771</span> <span class="sc">~</span> <span class="st">"Quận 10"</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079772</span> <span class="sc">~</span> <span class="st">"Quận 11"</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079773</span> <span class="sc">~</span> <span class="st">"Quận 4"</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079774</span> <span class="sc">~</span> <span class="st">"Quận 5"</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079775</span> <span class="sc">~</span> <span class="st">"Quận 6"</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079776</span> <span class="sc">~</span> <span class="st">"Quận 8"</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079777</span> <span class="sc">~</span> <span class="st">"Bình Tân"</span>, </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079778</span> <span class="sc">~</span> <span class="st">"Quận 7"</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079783</span> <span class="sc">~</span> <span class="st">"Củ Chi"</span>,</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079784</span> <span class="sc">~</span> <span class="st">"Hóc Môn"</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079785</span> <span class="sc">~</span> <span class="st">"Bình Chánh"</span>,</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079786</span> <span class="sc">~</span> <span class="st">"Nhà Bè"</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>GEO2_VN <span class="sc">==</span> <span class="dv">704079787</span> <span class="sc">~</span> <span class="st">"Cần Giờ"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stri_trans_general</span>(<span class="st">"latin-ascii"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_remove_all</span>(<span class="st">"Quan"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="at">which =</span> <span class="st">"both"</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>agr <span class="ot">=</span> df<span class="sc">$</span>AGE2 <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(df<span class="sc">$</span>agr) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"0-4"</span>, <span class="st">"5-9"</span>, <span class="st">"10-14"</span>,<span class="st">"15-19"</span>,</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"20-24"</span>,<span class="st">"25-29"</span>,<span class="st">"30-34"</span>,<span class="st">"35-39"</span>,</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"40-44"</span>,<span class="st">"45-49"</span>,<span class="st">"50-54"</span>,<span class="st">"55-59"</span>,</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"60-64"</span>,<span class="st">"65-69"</span>,<span class="st">"70-74"</span>,<span class="st">"75-79"</span>,</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"80-84"</span>,<span class="st">"85+"</span>)</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>SEX <span class="sc">==</span> <span class="dv">1</span>,<span class="st">"male"</span>,<span class="st">"female"</span>)</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>agepyr <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(<span class="st">"agr"</span>,<span class="st">"sex"</span>,<span class="st">"qh"</span>)] <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,agr,sex) <span class="sc">%&gt;%</span> <span class="fu">count</span>()</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>agepyr <span class="ot">&lt;-</span> agepyr <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">population2 =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    sex <span class="sc">==</span> <span class="st">"female"</span> <span class="sc">~</span> <span class="sc">-</span>n,</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> n</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>pop_range <span class="ot">&lt;-</span> <span class="fu">range</span>(agepyr<span class="sc">$</span>population2 <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>())</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>pop_range_breaks <span class="ot">&lt;-</span> <span class="fu">pretty</span>(pop_range, <span class="at">n =</span> <span class="dv">6</span>)</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>pop_range_breaks1 <span class="ot">&lt;-</span> <span class="fu">pretty</span>(pop_range<span class="sc">*</span><span class="fl">0.085</span>, <span class="at">n =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>hcm19 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"D:/OUCRU/hfmd/data/census2019.rds"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(province <span class="sc">==</span> <span class="st">"Thành phố Hồ Chí Minh"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>hcm19<span class="sc">$</span>district <span class="ot">&lt;-</span> hcm19<span class="sc">$</span>district <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_remove_all</span>(<span class="st">"Quận|Huyện"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_replace_all</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">b2</span><span class="sc">\\</span><span class="st">b|</span><span class="sc">\\</span><span class="st">b9</span><span class="sc">\\</span><span class="st">b"</span>  <span class="ot">=</span> <span class="st">"Thủ Đức"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stri_trans_general</span>(<span class="st">"latin-ascii"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="at">which =</span> <span class="st">"both"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>hcm19<span class="sc">$</span>age2 <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">word</span>(hcm19<span class="sc">$</span>age, <span class="dv">1</span>))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>hcm19<span class="sc">$</span>agr <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(<span class="fu">cut</span>(<span class="fu">as.numeric</span>(hcm19<span class="sc">$</span>age2), </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>              <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">14</span>,<span class="dv">19</span>,<span class="dv">24</span>,<span class="dv">29</span>,<span class="dv">34</span>,<span class="dv">39</span>,<span class="dv">44</span>,<span class="dv">49</span>,<span class="dv">54</span>,<span class="dv">59</span>,<span class="dv">64</span>,<span class="dv">69</span>,<span class="dv">74</span>,<span class="dv">79</span>,<span class="dv">84</span>,<span class="cn">Inf</span>), </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">right=</span><span class="cn">TRUE</span> ))</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(hcm19<span class="sc">$</span>agr) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"0-4"</span>, <span class="st">"5-9"</span>, <span class="st">"10-14"</span>,<span class="st">"15-19"</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"20-24"</span>,<span class="st">"25-29"</span>,<span class="st">"30-34"</span>,<span class="st">"35-39"</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"40-44"</span>,<span class="st">"45-49"</span>,<span class="st">"50-54"</span>,<span class="st">"55-59"</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"60-64"</span>,<span class="st">"65-69"</span>,<span class="st">"70-74"</span>,<span class="st">"75-79"</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"80-84"</span>,<span class="st">"85+"</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>popdis <span class="ot">&lt;-</span> hcm19 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(district) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">sum</span>(n))</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>district <span class="ot">&lt;-</span> popdis<span class="sc">$</span>district</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="do">## function to scale per</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>scale_per <span class="ot">&lt;-</span> <span class="cf">function</span>(data){</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  ou <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">22</span>){</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    oo <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(qh <span class="sc">==</span> district[i]) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">pop =</span> <span class="fu">rep</span>(<span class="fu">as.numeric</span>(popdis<span class="sc">$</span>n[popdis<span class="sc">$</span>district <span class="sc">==</span> district[i]])),</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>             <span class="at">per =</span> (n<span class="sc">/</span>pop)<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    ou <span class="ot">&lt;-</span> <span class="fu">rbind</span>(ou,oo)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ou)</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## education</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>edu <span class="ot">&lt;-</span>  <span class="fu">case_when</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>EDATTAIN <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"NIU"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>EDATTAIN <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Less than primary completed"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>EDATTAIN <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Primary completed"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>EDATTAIN <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Secondary completed"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>EDATTAIN <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"University completed"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"NIU"</span>, </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Less than primary completed"</span>, </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Primary completed"</span>, </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Secondary completed"</span>, </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>             <span class="st">"University completed"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>hcm_edu <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,edu) <span class="sc">%&gt;%</span> <span class="fu">count</span>()</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="do">## urban status</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>urban <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(df<span class="sc">$</span>URBAN <span class="sc">==</span> <span class="dv">2</span>,<span class="st">"Urban"</span>,<span class="st">"Rural"</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>urban <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,urban) <span class="sc">%&gt;%</span> <span class="fu">count</span>() </span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>hcm_chil5 <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,NCHLT5) <span class="sc">%&gt;%</span> <span class="fu">count</span>()</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="do">## religion</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>reli <span class="ot">&lt;-</span>  <span class="fu">case_when</span>(</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>RELIGION <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"No religion"</span>,</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>RELIGION <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Buddhist"</span>,</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>RELIGION <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"Muslim"</span>,</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>RELIGION <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"Christian"</span>,</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>RELIGION <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="st">"Other"</span>) </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>hcm_reli <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,reli) <span class="sc">%&gt;%</span> <span class="fu">count</span>()</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="do">## ownership</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>owner <span class="ot">&lt;-</span>  <span class="fu">case_when</span>(</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>OWNERSHIPD <span class="sc">==</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"NIU"</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>OWNERSHIPD <span class="sc">==</span> <span class="dv">100</span> <span class="sc">~</span> <span class="st">"Owned"</span>,</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>OWNERSHIPD <span class="sc">==</span> <span class="dv">214</span> <span class="sc">~</span> <span class="st">"Renting, private"</span>,</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>OWNERSHIPD <span class="sc">==</span> <span class="dv">211</span> <span class="sc">~</span> <span class="st">"Renting, government"</span>,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>OWNERSHIPD <span class="sc">==</span> <span class="dv">217</span> <span class="sc">~</span> <span class="st">"Renting, collective"</span>,</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>OWNERSHIPD <span class="sc">==</span> <span class="dv">290</span> <span class="sc">~</span> <span class="st">"Not owned, other"</span>) </span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>owner <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,owner) <span class="sc">%&gt;%</span> <span class="fu">count</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## plot</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>vac_cov <span class="ot">&lt;-</span> cov_df2 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(district, </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> date,<span class="at">y =</span> coverage<span class="sc">*</span><span class="dv">100</span>))<span class="sc">+</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">100</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">85</span>,<span class="dv">100</span>,<span class="at">by =</span> <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Date"</span>,<span class="at">y =</span> <span class="st">"Vaccine coverage (%)"</span>)<span class="sc">+</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">breaks =</span> <span class="st">"2 months"</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span> <span class="st">"%b %Y"</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">limits =</span> <span class="fu">c</span>(<span class="fu">as.Date</span>(<span class="st">"2022-09-01"</span>),<span class="fu">as.Date</span>(<span class="st">"2024-11-20"</span>)))<span class="sc">+</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),<span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>,<span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust=</span><span class="dv">1</span>)) </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>time_vac <span class="ot">&lt;-</span> out_timely <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(district, <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> date,<span class="at">y =</span> per<span class="sc">*</span><span class="dv">100</span>))<span class="sc">+</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_y_continuous(limits = c(50, 100), breaks = seq(50,100,by = 10)) +</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Date"</span>,<span class="at">y =</span> <span class="st">"Timely vaccination percentage (%)"</span>)<span class="sc">+</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">breaks =</span> <span class="st">"2 months"</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>               <span class="at">date_labels=</span> <span class="st">"%b %Y"</span>)<span class="sc">+</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),<span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>,<span class="at">size =</span> <span class="dv">8</span>,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust=</span><span class="dv">1</span>))</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="co"># age_prm &lt;- agepyr %&gt;% mutate(dis = factor(qh, </span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co">#                                  levels = as.character(sorted$district))) %&gt;% </span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggplot() +</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_col(aes(x = population2,</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="co">#                y = agr,</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="co">#                fill = sex)) +</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="co">#   # geom_col(aes(x = population2.y,</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="co">#   #              y = agr,</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="co">#   #              fill = sex),alpha=0.5) +</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_x_continuous(breaks  = pop_range_breaks1,</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="co">#                      labels = abs(pop_range_breaks1))+</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(vars(dis),</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="co">#              # scales = "free",</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="co">#              ncol = 1)+</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_light()+</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(x = "Population",y = "Age group")+</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(axis.text.x = element_text(size = 4.5),</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis.text.y = element_text(size = 4))</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>edu <span class="ot">&lt;-</span> <span class="fu">scale_per</span>(hcm_edu) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(qh,</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> per,</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> edu)) <span class="sc">+</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>             <span class="co"># scales = "free",</span></span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of total population(%)"</span>,</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Education"</span>)<span class="sc">+</span></span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()<span class="sc">+</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>)) </span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>urban <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(qh,urban) <span class="sc">%&gt;%</span> <span class="fu">count</span>()  </span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>urb <span class="ot">&lt;-</span> <span class="fu">scale_per</span>(urban) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(qh,</span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> per,</span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> urban)) <span class="sc">+</span></span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),</span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>             <span class="co"># scales = "free",</span></span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of total population(%)"</span>,</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Urban-rural status"</span>)<span class="sc">+</span></span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()<span class="sc">+</span></span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>))</span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>child5 <span class="ot">&lt;-</span> <span class="fu">scale_per</span>(hcm_chil5) <span class="sc">%&gt;%</span></span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(qh,</span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span></span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a>  <span class="co"># filter(NCHLT5 != 0) %&gt;%</span></span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> per,</span>
+<span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">as.factor</span>(NCHLT5))) <span class="sc">+</span></span>
+<span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),</span>
+<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a>             <span class="co"># scales = "free",</span></span>
+<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of total population(%)"</span>,</span>
+<span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of own children under age 5 in household"</span>)<span class="sc">+</span></span>
+<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()<span class="sc">+</span></span>
+<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb10-95"><a href="#cb10-95" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>)) </span>
+<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-97"><a href="#cb10-97" aria-hidden="true" tabindex="-1"></a>reli <span class="ot">&lt;-</span> <span class="fu">scale_per</span>(hcm_reli) <span class="sc">%&gt;%</span></span>
+<span id="cb10-98"><a href="#cb10-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(qh,</span>
+<span id="cb10-99"><a href="#cb10-99" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span></span>
+<span id="cb10-100"><a href="#cb10-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-101"><a href="#cb10-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> per,</span>
+<span id="cb10-102"><a href="#cb10-102" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">as.factor</span>(reli))) <span class="sc">+</span></span>
+<span id="cb10-103"><a href="#cb10-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),</span>
+<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a>             <span class="co"># scales = "free",</span></span>
+<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of total population(%)"</span>,</span>
+<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Religion"</span>)<span class="sc">+</span></span>
+<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()<span class="sc">+</span></span>
+<span id="cb10-109"><a href="#cb10-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb10-110"><a href="#cb10-110" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="vac_cov_files/figure-html/unnamed-chunk-5-1.svg" style="width:100.0%;height:100.0%"></p>
-</div>
-</div>
-</section>
-<section id="districts" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="districts"><span class="header-section-number">3.2</span> Districts</h2>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="vac_cov_files/figure-html/unnamed-chunk-7-1.svg" style="width:100.0%;height:100.0%"></p>
+<p><img src="vac_cov_files/figure-html/unnamed-chunk-19-1.svg" style="width:100.0%;height:100.0%"></p>
 </div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -429,7 +843,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./index.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Abstract</span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Timely vaccination</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

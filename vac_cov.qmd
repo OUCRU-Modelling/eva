@@ -1,18 +1,24 @@
 # Measles vaccine coverage
 
 ```{r}
+#| code-fold: true
+#| echo: true
 library(tidyverse)
 library(lubridate)
 library(janitor)
-Sys.setlocale("LC_TIME", "English")
+library(stringi)
+invisible(Sys.setlocale("LC_TIME", "English"))
 df <- readRDS("D:/OUCRU/assigned github/vac_coverage/data/vaxreg_hcmc_measles.rds")
 ```
 
 Vaccine shortage public started in May 2022 [source](https://www.vietnamplus.vn/thanh-pho-ho-chi-minh-het-vaccine-trong-chuong-trinh-tiem-chung-mo-rong-post909241.vnp#google_vignette)
 
-# Timely vaccination for each districts by time
+
 
 ```{r}
+#| code-fold: true
+#| echo: true
+
 district <- unique(df$district)
 week <- seq(as.Date("2022-05-01"),as.Date("2024-07-01"),by = "month")
 
@@ -42,28 +48,13 @@ for (k in 1:length(district)){
 }
 ```
 
-```{r}
-#| fig-width: 13
-#| fig-height: 8
-#| out-width: "100%"
-ggplot(data = out_timely,aes(x = date,y = per*100))+
-  geom_line()+
-  # scale_y_continuous(limits = c(50, 100), breaks = seq(50,100,by = 10)) +
-  labs(x = "Date",y = "Timely vaccination percentage (%)")+
-  scale_x_date(breaks = "2 months",
-               date_labels= "%b %Y")+
-  facet_wrap(vars(district),ncol = 5)+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle = 45,size = 8,
-                                   hjust=1))+ 
-  ggtitle("Timely vaccination percentage of children (9m-9m2w) who get vaccinated first dose within 1 month from May 2022 - July 2024")
-```
+# Vaccine coverage in Ho Chi Minh city
 
-# Vaccine coverage
-
-## Ho Chi Minh City
 
 ```{r}
+#| code-fold: true
+#| echo: true
+
 df$is_2d <- ifelse(df$is_m1 == 1 & df$is_m2 == 1,1,0)
 
 dfcal <- df[,c("dob","is_2d")]
@@ -89,6 +80,9 @@ for (i in 1:length(date)){
 #| fig-width: 13
 #| fig-height: 8
 #| out-width: "100%"
+#| code-fold: true
+#| echo: true
+
 main <- ggplot(data = cov_df,aes(x = date,y = coverage*100))+
   geom_line()+
   scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,by = 10)) +
@@ -105,23 +99,26 @@ sub <-  ggplot(data = cov_df,aes(x = date,y = coverage*100))+
   geom_line()+
   # scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,by = 10)) +
   labs(x = "Date",y = "Vaccine coverage (%)")+
-  scale_x_date(breaks = "4 month",
+  scale_x_date(breaks = "2 month",
                date_labels= "%b %Y",
                limits = c(as.Date("2022-09-01"),as.Date("2024-11-20")))+
   theme_bw()
 
 
 final1 <- main + annotation_custom(ggplotGrob(sub),
-                         xmin=as.Date("2023-07-01"), 
+                         xmin=as.Date("2023-05-01"), 
                          xmax=as.Date("2024-11-01"), 
                          ymin=5, ymax=80)
 
 final1 + ggtitle("Vaccine coverage of children (5m-5y) who get 2-doses vaccinated in Ho Chi Minh City from Sep 2022-Nov 2024")
 ```
 
-## Districts
+
 
 ```{r}
+#| code-fold: true
+#| echo: true
+
 dfcald <- df[,c("dob","district","is_2d")]
 
 cov_df2 <- data.frame()
@@ -142,25 +139,524 @@ for (k in 1:length(district)){
 }
 ```
 
+
 ```{r}
-#| fig-width: 13
-#| fig-height: 8
-#| out-width: "100%"
-final2 <- ggplot(data = cov_df2,aes(x = date,y = coverage*100))+
+#| code-fold: true
+#| echo: true
+
+meancv <- cov_df2 %>% 
+  group_by(district) %>% 
+  summarise(mean = mean(coverage)) 
+
+sorted <- meancv[order(-meancv$mean),]
+```
+
+# IPSUM (demographic data)
+
+
+```{r}
+#| code-fold: true
+#| echo: true
+
+# IPSUM
+df <- readRDS("D:/OUCRU/IPSUM/ipumsi_hcmc_2019.rds")
+
+df$qh <- case_when(
+  df$GEO2_VN == 704079760 ~ "Quận 1",
+  df$GEO2_VN == 704079761 ~ "Quận 12",
+  df$GEO2_VN == 704079762 ~ "Thủ Đức",
+  df$GEO2_VN == 704079763 ~ "Thủ Đức",
+  df$GEO2_VN == 704079764 ~ "Gò Vấp",
+  df$GEO2_VN == 704079765 ~ "Bình Thạnh",
+  df$GEO2_VN == 704079766 ~ "Tân Bình",
+  df$GEO2_VN == 704079767 ~ "Tân Phú",
+  df$GEO2_VN == 704079768 ~ "Phú Nhuận",
+  df$GEO2_VN == 704079769 ~ "Thủ Đức",
+  df$GEO2_VN == 704079770 ~ "Quận 3",
+  df$GEO2_VN == 704079771 ~ "Quận 10",
+  df$GEO2_VN == 704079772 ~ "Quận 11",
+  df$GEO2_VN == 704079773 ~ "Quận 4",
+  df$GEO2_VN == 704079774 ~ "Quận 5",
+  df$GEO2_VN == 704079775 ~ "Quận 6",
+  df$GEO2_VN == 704079776 ~ "Quận 8",
+  df$GEO2_VN == 704079777 ~ "Bình Tân", 
+  df$GEO2_VN == 704079778 ~ "Quận 7",
+  df$GEO2_VN == 704079783 ~ "Củ Chi",
+  df$GEO2_VN == 704079784 ~ "Hóc Môn",
+  df$GEO2_VN == 704079785 ~ "Bình Chánh",
+  df$GEO2_VN == 704079786 ~ "Nhà Bè",
+  df$GEO2_VN == 704079787 ~ "Cần Giờ") %>% 
+  stri_trans_general("latin-ascii") %>%
+  str_remove_all("Quan") %>% 
+  trimws(which = "both")
+
+
+df$agr = df$AGE2 %>% as.factor()
+
+levels(df$agr) = c("0-4", "5-9", "10-14","15-19",
+                   "20-24","25-29","30-34","35-39",
+                   "40-44","45-49","50-54","55-59",
+                   "60-64","65-69","70-74","75-79",
+                   "80-84","85+")
+
+df$sex <- ifelse(df$SEX == 1,"male","female")
+
+
+agepyr <- df[,c("agr","sex","qh")] %>% group_by(qh,agr,sex) %>% count()
+
+agepyr <- agepyr %>% mutate(
+  population2 = case_when(
+    sex == "female" ~ -n,
+    TRUE ~ n
+  )) %>% as.data.frame()
+
+pop_range <- range(agepyr$population2 %>% na.omit())
+
+pop_range_breaks <- pretty(pop_range, n = 6)
+
+pop_range_breaks1 <- pretty(pop_range*0.085, n = 10)
+
+```
+
+```{r}
+# hcm_para <- full_join(agepyr,agr_hcm19,by = c("qh" = "district",
+#                                   "agr"="agr",
+#                                   "sex"="sex")) 
+
+# hcm_para %>% 
+# ggplot() +
+#   geom_col(aes(x = population2.x,
+#                y = agr,
+#                fill = sex)) +
+#   geom_col(aes(x = population2.y,
+#                y = agr,
+#                fill = sex),alpha=0.5) +
+#   scale_x_continuous(breaks  = pop_range_breaks,
+#                      labels = abs(pop_range_breaks))+
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   theme_light()+
+#   labs(x = "Population",y = "Age group")+
+#   theme(axis.text.x = element_text(size = 4.5),
+#         axis.text.y = element_text(size = 4))
+```
+
+
+```{r}
+# hcm_para %>% 
+# ggplot() +
+#   geom_col(aes(x = population2.x,
+#                y = agr,
+#                fill = sex)) +
+#   # geom_col(aes(x = population2.y,
+#   #              y = agr,
+#   #              fill = sex),alpha=0.5) +
+#   scale_x_continuous(breaks  = pop_range_breaks1,
+#                      labels = abs(pop_range_breaks1))+
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   theme_light()+
+#   labs(x = "Population",y = "Age group")+
+#   theme(axis.text.x = element_text(size = 4.5),
+#         axis.text.y = element_text(size = 4))
+```
+
+
+
+
+```{r,results='hide'}
+# popden <- hcm19 %>% group_by(district) %>% 
+#   summarise(n = sum(n)) %>% 
+#   mutate(dt = c(7.72,5.72,5.14,52.74,4.92,
+#                 4.18,4.27,7.14,35.69,19.11,
+#                 252.56,52.02,20.78,704.45,434.77,
+#                 19.73,109.17,100.43,4.88,22.43,
+#                 15.97,211.56),
+#          popden = n/dt) %>% 
+#   as.data.frame()
+# 
+# popden$district <- popden$district %>% 
+#   tolower()
+# 
+# library(sf)
+# library(janitor)
+# map_path <- "D:/OUCRU/HCDC/project phân tích sero quận huyện/"
+# 
+# vn_qh <- st_read(dsn = file.path(map_path,"gadm41_VNM.gpkg"), layer = "ADM_ADM_2")
+# 
+# vn_qh1 <- vn_qh %>%
+#   clean_names() %>%     ## cho thành chữ thường
+#   filter(
+#     str_detect(
+#       name_1,
+#       "Hồ Chí Minh"
+#     )
+#   )
+# 
+# qhtp <- vn_qh1[-c(14,21),]
+# 
+# 
+# qhtp$geom[qhtp$varname_2 == "Thu Duc"] <- vn_qh1[c("21","24","14"),] %>%
+#   st_union()
+# 
+# qhtp <- qhtp %>% st_cast("MULTIPOLYGON")
+# 
+# qhtp$varname_2 <- stri_trans_general(qhtp$varname_2, "latin-ascii") %>%
+#   tolower() %>%
+#   str_remove("district") %>%
+#   trimws(which = "both")
+# 
+# qhtp$name_2 <- qhtp$name_2 %>% 
+#   str_remove("Quận|Huyện") %>%
+#   trimws(which = "both")
+# qhtp$nl_name_2 <- c("BC","BTân","BT","CG","CC","GV",
+#                     "HM","NB","PN","1","10","11","12"
+#                     ,"3","4","5","6","7","8","TB",
+#                     "TP","TĐ")
+# 
+# dfp <- left_join(qhtp,popden, by = join_by(varname_2 == district))
+# 
+# dfp %>% ggplot() +
+#   geom_sf(aes(fill = popden),show.legend = T)+
+#   scale_fill_continuous(low="yellow", high="red",
+#                         guide="colorbar",na.value="white",
+#                         name = "Population density")+
+#    geom_sf_text(aes(label = nl_name_2), size = 1.5)+
+#   theme_void()
+```
+
+
+```{r}
+# colnames(popden) <- c("District","Population","Area(km^2)","Population Density")
+# popden
+```
+
+
+```{r}
+#| code-fold: true
+#| echo: true
+
+hcm19 <- readRDS("D:/OUCRU/hfmd/data/census2019.rds") %>% 
+  filter(province == "Thành phố Hồ Chí Minh")
+
+hcm19$district <- hcm19$district %>%
+  str_remove_all("Quận|Huyện") %>%
+  str_replace_all(
+    c("\\b2\\b|\\b9\\b"  = "Thủ Đức")) %>%
+  stri_trans_general("latin-ascii") %>% 
+  trimws(which = "both")
+
+
+hcm19$age2 <- as.numeric(word(hcm19$age, 1))
+
+
+hcm19$agr <- as.factor(cut(as.numeric(hcm19$age2), 
+              c(0,4, 9, 14,19,24,29,34,39,44,49,54,59,64,69,74,79,84,Inf), 
+              right=TRUE ))
+
+levels(hcm19$agr) = c("0-4", "5-9", "10-14","15-19",
+                   "20-24","25-29","30-34","35-39",
+                   "40-44","45-49","50-54","55-59",
+                   "60-64","65-69","70-74","75-79",
+                   "80-84","85+")
+popdis <- hcm19 %>% group_by(district) %>% 
+    summarise(n = sum(n))
+district <- popdis$district
+
+
+## function to scale per
+scale_per <- function(data){
+  ou <- data.frame()
+  for (i in 1:22){
+    oo <- data %>% filter(qh == district[i]) %>% 
+      mutate(pop = rep(as.numeric(popdis$n[popdis$district == district[i]])),
+             per = (n/pop)*100)
+    ou <- rbind(ou,oo)
+  }
+  return(ou)
+}
+```
+
+
+
+```{r}
+# scale_per(hcm_edu) %>%
+#   ggplot() +
+#   geom_col(aes(x = per,
+#                y = edu)) +
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   labs(x = "Percentage of total population(%)",
+#        y = "Education")+
+#   theme_light()+
+#   theme(axis.text.x = element_text(size = 6),
+#         axis.text.y = element_text(size = 6))  
+```
+
+
+```{r}
+#| code-fold: true
+#| echo: true
+
+## education
+
+df$edu <-  case_when(
+  df$EDATTAIN == 0 ~ "NIU",
+  df$EDATTAIN == 1 ~ "Less than primary completed",
+  df$EDATTAIN == 2 ~ "Primary completed",
+  df$EDATTAIN == 3 ~ "Secondary completed",
+  df$EDATTAIN == 4 ~ "University completed") %>% 
+  
+  factor(levels = c("NIU", 
+             "Less than primary completed", 
+             "Primary completed", 
+             "Secondary completed", 
+             "University completed")
+)
+
+hcm_edu <- df %>% group_by(qh,edu) %>% count()
+
+## urban status
+df$urban <- ifelse(df$URBAN == 2,"Urban","Rural")
+urban <- df %>% group_by(qh,urban) %>% count() 
+
+hcm_chil5 <- df %>% group_by(qh,NCHLT5) %>% count()
+
+## religion
+
+df$reli <-  case_when(
+  df$RELIGION == 1 ~ "No religion",
+  df$RELIGION == 2 ~ "Buddhist",
+  df$RELIGION == 5 ~ "Muslim",
+  df$RELIGION == 6 ~ "Christian",
+  df$RELIGION == 7 ~ "Other") 
+
+hcm_reli <- df %>% group_by(qh,reli) %>% count()
+
+## ownership
+df$owner <-  case_when(
+  df$OWNERSHIPD == 0 ~ "NIU",
+  df$OWNERSHIPD == 100 ~ "Owned",
+  df$OWNERSHIPD == 214 ~ "Renting, private",
+  df$OWNERSHIPD == 211 ~ "Renting, government",
+  df$OWNERSHIPD == 217 ~ "Renting, collective",
+  df$OWNERSHIPD == 290 ~ "Not owned, other") 
+owner <- df %>% group_by(qh,owner) %>% count() 
+
+```
+
+
+
+```{r}
+
+# scale_per(urban) %>%
+#   ggplot() +
+#   geom_col(aes(x = per,
+#                y = urban)) +
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   labs(x = "Percentage of total population(%)",
+#        y = "Urban-rural status")+
+#   theme_light()+
+#   theme(axis.text.x = element_text(size = 6),
+#         axis.text.y = element_text(size = 6))  
+
+
+# scale_per(hcm_chil5) %>%
+#   # filter(NCHLT5 != 0) %>%
+#   ggplot() +
+#   geom_col(aes(x = per,
+#                y = as.factor(NCHLT5))) +
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   labs(x = "Percentage of total population(%)",
+#        y = "Number of own children under age 5 in household")+
+#   theme_light()+
+#   theme(axis.text.x = element_text(size = 6),
+#         axis.text.y = element_text(size = 6))  
+```
+
+
+```{r}
+# %>% 
+#   factor(levels = c("NIU", 
+#                     "Less than primary completed", 
+#                     "Primary completed", 
+#                     "Secondary completed", 
+#                     "University completed"))
+
+
+# 
+# scale_per(hcm_reli) %>%
+#   ggplot() +
+#   geom_col(aes(x = per,
+#                y = as.factor(reli))) +
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   labs(x = "Percentage of total population(%)",
+#        y = "Religion")+
+#   theme_light()+
+#   theme(axis.text.x = element_text(size = 6),
+#         axis.text.y = element_text(size = 6))  
+
+```
+
+
+
+```{r}
+
+# scale_per(owner) %>%
+#   ggplot() +
+#   geom_col(aes(x = per,
+#                y = owner)) +
+#   facet_wrap(vars(qh),
+#              # scales = "free",
+#              ncol = 5)+
+#   labs(x = "Percentage of total population(%)",
+#        y = "Education")+
+#   theme_light()+
+#   theme(axis.text.x = element_text(size = 6),
+#         axis.text.y = element_text(size = 6))  
+
+```
+
+
+
+```{r}
+#| code-fold: true
+#| echo: true
+
+## plot
+library(patchwork)
+
+vac_cov <- cov_df2 %>% mutate(dis = factor(district, 
+                                levels = as.character(sorted$district))) %>% 
+  ggplot(aes(x = date,y = coverage*100))+
   geom_line()+
   scale_y_continuous(limits = c(85, 100), breaks = seq(85,100,by = 5)) +
   labs(x = "Date",y = "Vaccine coverage (%)")+
   scale_x_date(breaks = "2 months",
                date_labels= "%b %Y",
                limits = c(as.Date("2022-09-01"),as.Date("2024-11-20")))+
-  facet_wrap(vars(district),ncol = 5)+
+  facet_wrap(vars(dis),ncol = 1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45,size = 8,
-                                    hjust=1))
+                                   hjust=1)) 
 
-final2 + 
-  ggtitle("Vaccine coverage by districts of children (5m-5y) who get vaccinated two doses from Sep 2022-Nov 2024")
+time_vac <- out_timely %>% mutate(dis = factor(district, levels = as.character(sorted$district))) %>% 
+  ggplot(aes(x = date,y = per*100))+
+  geom_line()+
+  # scale_y_continuous(limits = c(50, 100), breaks = seq(50,100,by = 10)) +
+  labs(x = "Date",y = "Timely vaccination percentage (%)")+
+  scale_x_date(breaks = "2 months",
+               date_labels= "%b %Y")+
+  facet_wrap(vars(dis),ncol = 1)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45,size = 8,
+                                   hjust=1))
+
+# age_prm <- agepyr %>% mutate(dis = factor(qh, 
+#                                  levels = as.character(sorted$district))) %>% 
+#   ggplot() +
+#   geom_col(aes(x = population2,
+#                y = agr,
+#                fill = sex)) +
+#   # geom_col(aes(x = population2.y,
+#   #              y = agr,
+#   #              fill = sex),alpha=0.5) +
+#   scale_x_continuous(breaks  = pop_range_breaks1,
+#                      labels = abs(pop_range_breaks1))+
+#   facet_wrap(vars(dis),
+#              # scales = "free",
+#              ncol = 1)+
+#   theme_light()+
+#   labs(x = "Population",y = "Age group")+
+#   theme(axis.text.x = element_text(size = 4.5),
+#         axis.text.y = element_text(size = 4))
+
+edu <- scale_per(hcm_edu) %>% 
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = edu)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
+urban <- df %>% group_by(qh,urban) %>% count()  
+
+urb <- scale_per(urban) %>% 
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = urban)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Urban-rural status")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15))
+
+child5 <- scale_per(hcm_chil5) %>%
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  # filter(NCHLT5 != 0) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(NCHLT5))) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Number of own children under age 5 in household")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
+reli <- scale_per(hcm_reli) %>%
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(reli))) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Religion")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
 ```
+
+```{r}
+#| fig-width: 30
+#| fig-height: 30
+#| out-width: "100%"
+vac_cov | time_vac | edu |urb | child5 | reli 
+```
+
+
+
+
+
+
 
 
 

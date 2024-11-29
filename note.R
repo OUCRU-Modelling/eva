@@ -183,22 +183,47 @@ ggplot(data = out_timely,aes(x = date,y = per*100))+
 
 ## compare with demographic data
 
-meandf <- out_timely %>% group_by(district) %>% 
+# timely vaccination and coverage
+
+meancv <- cov_df2 %>% 
+  group_by(district) %>% 
+  summarise(mean = mean(coverage)) 
+
+sorted <- meancv[order(-meancv$mean),]
+
+dis <- factor(sorted$district,levels = as.character(sorted$district))
+
+meancv %>% 
+  ggplot(aes(x = mean*100,y = district))+
+  geom_bar(stat = "identity")+
+  scale_x_continuous(breaks = seq(0,100,10),limits = c(0,100))+
+  scale_y_discrete(limits = rev(dis))+
+  labs(x = "Mean of vaccine coverage (%)",y = "District")
+
+
+out_timely %>% mutate(dis = factor(district, levels = as.character(sorted$district))) %>% 
+ggplot(aes(x = date,y = per*100))+
+  geom_line()+
+  # scale_y_continuous(limits = c(50, 100), breaks = seq(50,100,by = 10)) +
+  labs(x = "Date",y = "Timely vaccination percentage (%)")+
+  scale_x_date(breaks = "2 months",
+               date_labels= "%b %Y")+
+  facet_wrap(vars(dis),ncol = 1)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45,size = 8,
+                                   hjust=1))+ 
+  ggtitle("Timely vaccination percentage of children (9m-9m2w) who get vaccinated first dose within 1 month from May 2022 - July 2024")
+
+
+meandf <- out_timely %>% 
+  group_by(district) %>% 
   summarise(mean = mean(per)) 
 
-sorted <- meandf[order(-meandf$mean),]  
-
-s_dis <- sorted$district
-
-sorted %>% as.data.frame()
-
-sorted %>% 
+meandf %>% 
   ggplot(aes(x = mean*100,y = dis))+
   geom_bar(stat = "identity")+
   scale_x_continuous(breaks = seq(0,100,10),limits = c(0,100))+
-  labs(x = "Timely vaccination percentage",y = "District")
-
-sorted %>% order(-sorted$mean)
+  labs(x = "Mean of vaccine coverage (%)",y = "District")
 
 ###
 
@@ -278,6 +303,119 @@ agepyr %>%
   theme(axis.text.x = element_text(size = 4.5),
         axis.text.y = element_text(size = 4))
 
+### 
+library(patchwork)
+
+vac_cov <- cov_df2 %>% mutate(dis = factor(district, 
+                                levels = as.character(sorted$district))) %>% 
+  ggplot(aes(x = date,y = coverage*100))+
+  geom_line()+
+  scale_y_continuous(limits = c(85, 100), breaks = seq(85,100,by = 5)) +
+  labs(x = "Date",y = "Vaccine coverage (%)")+
+  scale_x_date(breaks = "2 months",
+               date_labels= "%b %Y",
+               limits = c(as.Date("2022-09-01"),as.Date("2024-11-20")))+
+  facet_wrap(vars(dis),ncol = 1)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45,size = 8,
+                                   hjust=1)) 
+
+time_vac <- out_timely %>% mutate(dis = factor(district, levels = as.character(sorted$district))) %>% 
+  ggplot(aes(x = date,y = per*100))+
+  geom_line()+
+  # scale_y_continuous(limits = c(50, 100), breaks = seq(50,100,by = 10)) +
+  labs(x = "Date",y = "Timely vaccination percentage (%)")+
+  scale_x_date(breaks = "2 months",
+               date_labels= "%b %Y")+
+  facet_wrap(vars(dis),ncol = 1)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45,size = 8,
+                                   hjust=1))
+
+age_prm <- hcm_para %>% mutate(dis = factor(qh, 
+                                 levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = population2.x,
+               y = agr,
+               fill = sex)) +
+  # geom_col(aes(x = population2.y,
+  #              y = agr,
+  #              fill = sex),alpha=0.5) +
+  scale_x_continuous(breaks  = pop_range_breaks1,
+                     labels = abs(pop_range_breaks1))+
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  theme_light()+
+  labs(x = "Population",y = "Age group")+
+  theme(axis.text.x = element_text(size = 4.5),
+        axis.text.y = element_text(size = 4))
+
+edu <- scale_per(hcm_edu) %>% 
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = edu)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6)) 
+
+urban <- df %>% group_by(qh,urban) %>% count()  
+
+urb <- scale_per(urban) %>% 
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = urban)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Urban-rural status")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6))
+
+child5 <- scale_per(hcm_chil5) %>%
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  # filter(NCHLT5 != 0) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(NCHLT5))) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Number of own children under age 5 in household")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6)) 
+
+reli <- scale_per(hcm_reli) %>%
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(reli))) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Religion")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6)) 
 
 
+vac_cov | time_vac | age_prm | edu |urb | child5 | reli
 
+ggsave("D:/OUCRU/vac_co.svg",
+       width = 30,height = 30)
