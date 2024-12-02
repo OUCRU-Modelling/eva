@@ -423,6 +423,8 @@ hcm_edu <- df %>% group_by(qh,edu) %>% count()
 df$urban <- ifelse(df$URBAN == 2,"Urban","Rural")
 urban <- df %>% group_by(qh,urban) %>% count() 
 
+
+## number of children under 5 years old
 hcm_chil5 <- df %>% group_by(qh,NCHLT5) %>% count()
 
 ## religion
@@ -594,8 +596,6 @@ edu <- scale_per(hcm_edu) %>%
   theme_light()+
   theme(axis.text.x = element_text(size = 15),
         axis.text.y = element_text(size = 15)) 
-
-urban <- df %>% group_by(qh,urban) %>% count()  
 
 urb <- scale_per(urban) %>% 
   mutate(dis = factor(qh,
