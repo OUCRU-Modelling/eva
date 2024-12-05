@@ -18,6 +18,7 @@ book:
     - index.qmd
     - vac_cov.qmd
     - ipsum.qmd
+    - nestedness.qmd
     
     
 format:

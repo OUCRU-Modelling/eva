@@ -1,0 +1,75 @@
+# Nestedness analysis
+
+```{r}
+#| code-fold: true
+#| echo: true
+library(vegan)
+library(tidyverse)
+library(stringi)
+```
+
+```{r}
+#| code-fold: true
+#| echo: true
+df <- readRDS("D:/OUCRU/IPSUM/ipumsi_hcmc_2019.rds")
+
+df$qh <- case_when(
+  df$GEO2_VN == 704079760 ~ "Quận 1",
+  df$GEO2_VN == 704079761 ~ "Quận 12",
+  df$GEO2_VN == 704079762 ~ "Thủ Đức",
+  df$GEO2_VN == 704079763 ~ "Thủ Đức",
+  df$GEO2_VN == 704079764 ~ "Gò Vấp",
+  df$GEO2_VN == 704079765 ~ "Bình Thạnh",
+  df$GEO2_VN == 704079766 ~ "Tân Bình",
+  df$GEO2_VN == 704079767 ~ "Tân Phú",
+  df$GEO2_VN == 704079768 ~ "Phú Nhuận",
+  df$GEO2_VN == 704079769 ~ "Thủ Đức",
+  df$GEO2_VN == 704079770 ~ "Quận 3",
+  df$GEO2_VN == 704079771 ~ "Quận 10",
+  df$GEO2_VN == 704079772 ~ "Quận 11",
+  df$GEO2_VN == 704079773 ~ "Quận 4",
+  df$GEO2_VN == 704079774 ~ "Quận 5",
+  df$GEO2_VN == 704079775 ~ "Quận 6",
+  df$GEO2_VN == 704079776 ~ "Quận 8",
+  df$GEO2_VN == 704079777 ~ "Bình Tân", 
+  df$GEO2_VN == 704079778 ~ "Quận 7",
+  df$GEO2_VN == 704079783 ~ "Củ Chi",
+  df$GEO2_VN == 704079784 ~ "Hóc Môn",
+  df$GEO2_VN == 704079785 ~ "Bình Chánh",
+  df$GEO2_VN == 704079786 ~ "Nhà Bè",
+  df$GEO2_VN == 704079787 ~ "Cần Giờ") %>% 
+  stri_trans_general("latin-ascii") %>%
+  str_remove_all("Quan") %>% 
+  trimws(which = "both")
+
+##
+
+df$ownership <- ifelse(df$OWNERSHIP == 1,1,0)
+df$water_supply <- ifelse(df$WATSUP == 10,1,0)
+df$aircon <- ifelse(df$AIRCON == 10,0,1)
+df$computer <- ifelse(df$COMPUTER == 2,1,0)
+df$washer <- ifelse(df$WASHER == 2,1,0)
+df$refrig <- ifelse(df$REFRIG == 2,1,0)
+df$tv <- ifelse(df$TV == 20,1,0)
+df$radio <- ifelse(df$RADIO == 2,1,0)
+df$electric <- ifelse(df$ELECTRIC == 1,1,0)
+df$hotwater <- ifelse(df$HOTWATER == 2,1,0)
+df$phone <- ifelse(df$PHONE == 2,1,0)
+
+wealth_index <- df[,c("qh","ownership","water_supply","aircon","computer",
+                      "washer","refrig","tv","radio","electric",
+                      "hotwater","phone")] 
+```
+
+```{r}
+#| fig-width: 15
+#| fig-height: 10
+#| fig-format: png
+#| code-fold: true
+#| echo: true
+#| 
+d1 <- nestedtemp(wealth_index[,-1])
+
+plot(d1, kind="incid",names = TRUE,ylab="",yaxt="n",las=1)
+```
+
