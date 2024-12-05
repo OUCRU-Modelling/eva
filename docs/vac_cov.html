@@ -169,6 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#vaccine-coverage-in-ho-chi-minh-city" id="toc-vaccine-coverage-in-ho-chi-minh-city" class="nav-link active" data-scroll-target="#vaccine-coverage-in-ho-chi-minh-city"><span class="header-section-number">2</span> Vaccine coverage in Ho Chi Minh city</a></li>
   <li><a href="#ipsum-demographic-data" id="toc-ipsum-demographic-data" class="nav-link" data-scroll-target="#ipsum-demographic-data"><span class="header-section-number">3</span> IPSUM (demographic data)</a></li>
+  <li><a href="#simple-model-between-demographic-and-vax-cov" id="toc-simple-model-between-demographic-and-vax-cov" class="nav-link" data-scroll-target="#simple-model-between-demographic-and-vax-cov"><span class="header-section-number">4</span> Simple model between demographic and vax cov</a></li>
   </ul>
 </nav>
     </div>
@@ -606,6 +607,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="vac_cov_files/figure-html/unnamed-chunk-19-1.svg" style="width:100.0%;height:100.0%"></p>
+</div>
+</div>
+</section>
+<section id="simple-model-between-demographic-and-vax-cov" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Simple model between demographic and vax cov</h1>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mean ~ edu + urban + reli + owner + NCHLT5, data = demo_cov)
+
+Coefficients:
+                   (Intercept)  eduLess than primary completed  
+                     0.9380243                       0.0001052  
+          eduPrimary completed          eduSecondary completed  
+                    -0.0010291                      -0.0004454  
+       eduUniversity completed                      urbanUrban  
+                    -0.0003381                      -0.0047970  
+                 reliChristian                      reliMuslim  
+                    -0.0037140                      -0.0032125  
+               reliNo religion                       reliOther  
+                    -0.0024056                       0.0009454  
+         ownerNot owned, other                      ownerOwned  
+                     0.0051975                       0.0018654  
+      ownerRenting, collective        ownerRenting, government  
+                     0.0033554                       0.0034545  
+         ownerRenting, private                          NCHLT5  
+                     0.0011316                       0.0005769  </code></pre>
 </div>
 </div>
 

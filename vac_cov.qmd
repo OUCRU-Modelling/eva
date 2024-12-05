@@ -652,8 +652,16 @@ reli <- scale_per(hcm_reli) %>%
 vac_cov | time_vac | edu |urb | child5 | reli 
 ```
 
+# Simple model between demographic and vax cov
 
+```{r}
+# education, urban status, religion, ownership, number of children less than 5 years
+demogra <- df[,c("qh","edu","urban","reli","owner","NCHLT5")]
+demo_cov <- full_join(demogra,meancv, by = c("qh" = "district"))
 
+model <- lm(mean ~ edu + urban + reli + owner + NCHLT5,data = demo_cov)
+model
+```
 
 
 
