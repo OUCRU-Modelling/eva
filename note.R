@@ -419,3 +419,13 @@ vac_cov | time_vac | age_prm | edu |urb | child5 | reli
 
 ggsave("D:/OUCRU/vac_co.svg",
        width = 30,height = 30)
+
+
+
+
+
+
+
+
+
+

@@ -663,8 +663,162 @@ model <- lm(mean ~ edu + urban + reli + owner + NCHLT5,data = demo_cov)
 model
 ```
 
+# Delay distribution
 
+```{r}
+#| code-fold: true
+#| echo: true
+library(stringi)
+library(lubridate)
+dttlv$date_m1_ontime <- dttlv$dob %m+% months(9)
+dttlv$delay <- interval(dttlv$date_m1_ontime,dttlv$date_m1) / months(1)
+```
 
+## Delay distribution of HCMC
+
+```{r}
+#| code-fold: true
+#| echo: true
+dttlv %>% na.omit() %>% 
+  filter(delay > 0 & date_m1_ontime >= as.Date("2022-05-01")
+         & date_m1_ontime <= as.Date("2023-12-31")) %>% 
+  ggplot(aes(x=delay)) +
+  geom_density()+
+  labs(x = "Month")
+```
+
+## Each districts with demographic variables
+
+```{r}
+#| code-fold: true
+#| echo: true
+meandl <- dttlv %>% na.omit() %>% 
+  filter(delay > 0 & date_m1_ontime >= as.Date("2022-05-01")
+         & date_m1_ontime <= as.Date("2023-12-31")) %>% 
+  group_by(district) %>% 
+  summarise(median = median(delay,na.rm = T)) 
+
+sorted <- meandl[order(-meandl$median),]
+```
+
+```{r}
+#| code-fold: true
+#| echo: true
+vac_dl <- dttlv %>% 
+  mutate(dis = factor(district, 
+         levels = as.character(sorted$district))) %>% 
+  filter(delay > 0 & date_m1_ontime >= as.Date("2022-05-01")
+         & date_m1_ontime <= as.Date("2023-12-31")) %>% 
+  ggplot(aes(x=delay)) +
+  geom_density()+
+  labs(x = "Month")+
+  xlim(0,5)+
+  facet_wrap(vars(dis),ncol = 1)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45,size = 8,
+                                   hjust=1)) 
+##
+month <- seq(as.Date("2022-05-01"),as.Date("2024-01-01"),by = "month")
+dis2 <- dttlv$district %>% unique()
+uot <- data.frame()
+uot2 <- data.frame()
+for (k in 1:length(dis2)){
+  dtd <- dttlv %>% filter(district == dis2[k])
+  for (i in 1:(length(month)-1)){
+    emon <- dtd %>% na.omit() %>% 
+      filter(date_m1_ontime >= month[i] & 
+               date_m1_ontime <= month[i+1] &
+               delay > 0)
+    uot2 <- data.frame(district = dis2[k],
+                       month = month[i],
+                       del = median(emon$delay)) 
+    uot <- rbind(uot,uot2)
+  }  
+}
+
+month_delay <- uot %>% 
+  mutate(dis = factor(district, 
+                      levels = as.character(sorted$district))) %>%
+  ggplot(aes(x = month,y=del)) +
+  geom_bar(stat = "identity")+
+  labs(x = "Month", y = "The median of delayed month")+
+  facet_wrap(vars(dis),ncol = 1)+
+  scale_x_date(breaks = "2 months",
+               date_labels= "%b %Y")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45,size = 8,
+                                   hjust=1)) 
+##
+edu <- scale_per(hcm_edu) %>% 
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = edu)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
+urb <- scale_per(urban) %>% 
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = urban)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Urban-rural status")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15))
+
+child5 <- scale_per(hcm_chil5) %>%
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  # filter(NCHLT5 != 0) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(NCHLT5))) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Number of own children under age 5 in household")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
+reli <- scale_per(hcm_reli) %>%
+  mutate(dis = factor(qh,
+                      levels = as.character(sorted$district))) %>%
+  ggplot() +
+  geom_col(aes(x = per,
+               y = as.factor(reli))) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Religion")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+```
+
+```{r}
+#| code-fold: true
+#| echo: true
+#| fig-width: 30
+#| fig-height: 30
+#| out-width: "100%"
+vac_dl |month_delay |edu |urb | child5 | reli 
+```
 
 
 
