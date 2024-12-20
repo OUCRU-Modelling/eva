@@ -1,40 +1,24 @@
-# Measles vaccine coverage
-
-```{r}
-#| code-fold: true
-#| echo: true
+library(readr)
+library(vegan)
 library(tidyverse)
 library(lubridate)
 library(janitor)
 library(stringi)
 library(patchwork)
-library(vegan)
 invisible(Sys.setlocale("LC_TIME", "English"))
+
+## data vaccine
 df_raw <- readRDS("D:/OUCRU/assigned github/vac_coverage/data/vaxreg_hcmc_measles.rds")
-```
-
-```{r}
-#| code-fold: true
-#| echo: true
-## data cleaning
 df <- df_raw %>% na.omit() %>% 
-                 subset(date_m1 > dob & 
-                        date_m2 > dob & 
-                        date_m1 < date_m2 &
-                        year(date_m2) <= 2024 &
-                        year(date_m1) >= min(year(df_raw$dob))) 
-```
-
-Vaccine shortage public started in May 2022 [source](https://www.vietnamplus.vn/thanh-pho-ho-chi-minh-het-vaccine-trong-chuong-trinh-tiem-chung-mo-rong-post909241.vnp#google_vignette)
-
-# Vaccine coverage (1st and 2nd dose) in Ho Chi Minh city
-
-```{r}
-#| code-fold: true
-#| echo: true
+  subset(date_m1 > dob & 
+           date_m2 > dob & 
+           date_m1 < date_m2 &
+           year(date_m2) <= 2024 &
+           year(date_m1) >= min(year(df_raw$dob))) 
 
 ## vaccine coverage 1st and 2nd dose
 date_compute <- seq(as.Date("2022-09-01"),as.Date("2024-11-20"),by = "weeks")
+
 
 ## second dose
 out_fn <- data.frame()
@@ -88,7 +72,6 @@ for (i in 1:length(date_compute)){
   out_fn1 <- rbind(out_fn1,outa)
 }
 
-
 ## plot
 
 vac_co <- ggplot()+
@@ -116,24 +99,49 @@ vac_co2w <-ggplot()+
                                    hjust=1))+
   scale_color_manual(name="Dose", values=c("1"="red", "2"="blue"))+
   theme_bw()
-```
-
-```{r}
-#| fig-width: 13
-#| fig-height: 8
-#| out-width: "100%"
-#| code-fold: true
-#| echo: true
 
 vac_co | vac_co2w
-```
 
-# Coverage
 
-```{r}
-#| code-fold: true
-#| echo: true
+## timely vaccination
 district <- unique(df$district)
+week <- seq(as.Date("2022-05-01"),as.Date("2024-07-01"),by = "month")
+
+dttlv <- df[,c("dob","district","date_m1","date_m2")] 
+out_timely <- data.frame()
+
+for (k in 1:length(district)){
+  td <- subset(dttlv, district == district[k]) 
+  for (i in 1:length(week)){
+    td$lackd <- week[i]
+    td$ageuntil <- decimal_date(td$lackd) - decimal_date(td$dob)
+    
+    ## subset children aged from 9 months to 9 months 2 weeks at chosen time
+    slec <- td[td$ageuntil >= 0.75 & td$ageuntil <= 0.75 + 0.5*(1/12),]
+    
+    slec$agevac <- decimal_date(slec$date_m1) - decimal_date(slec$dob)
+    slec$vac_on_date1 <- ifelse(slec$agevac < slec$ageuntil + 1/12,1,0)
+    slec$vac_on_date1 <- replace(slec$vac_on_date, is.na(slec$vac_on_date1),0)
+    
+    re <- slec %>% group_by(vac_on_date1) %>% count()  
+    
+    if(nrow(re) == 1){
+      re[2,] <- re[1,]
+      re[1,1] <- 0  
+      re[1,2] <- 0  
+    } 
+    
+    cus <- data.frame(district = district[k],
+                      date = week[i],
+                      per = as.numeric(re[2,2])/(as.numeric(re[2,2])+as.numeric(re[1,2])))
+    out_timely <- rbind(out_timely,cus)
+  }
+}
+
+## timely vaccination percentage
+out_timely
+
+### 
 
 out_d <- data.frame()
 out_d1 <- data.frame()
@@ -170,86 +178,11 @@ meancv <- out_d %>%
 
 sorted <- meancv[order(-meancv$mean),]
 
-vac_cov <- out_d %>% mutate(dis = factor(district,
-                              levels = as.character(sorted$district))) %>% 
-ggplot()+
-  geom_line(aes(x = date,y = cov*100,color="2"))+
-  scale_y_continuous(limits = c(0, 100), breaks = seq(0,100,by = 10)) +
-  labs(x = "Date",y = "Vaccine coverage (%)")+
-  scale_x_date(breaks = "4 months",
-               date_labels= "%b %Y",
-               limits = c(as.Date("2022-09-01"),as.Date("2024-11-20")))+
-  facet_wrap(vars(dis),ncol = 1)+
-  scale_color_manual(name="Dose", values=c("1"="red", "2"="blue"))+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle = 45,size = 8,hjust=1),
-        axis.text.y = element_text(size = 6))
-
-```
-
-
-# Timely vaccination
-
-```{r}
-#| code-fold: true
-#| echo: true
-
-week <- seq(as.Date("2022-05-01"),as.Date("2024-07-01"),by = "month")
-
-dttlv <- df[,c("dob","district","date_m1","date_m2")] 
-out_timely <- data.frame()
-
-for (k in 1:length(district)){
-  td <- subset(dttlv, district == district[k]) 
-  for (i in 1:length(week)){
-    td$lackd <- week[i]
-    td$ageuntil <- decimal_date(td$lackd) - decimal_date(td$dob)
-    
-    ## subset children aged from 9 months to 9 months 2 weeks at chosen time
-    slec <- td[td$ageuntil >= 0.75 & td$ageuntil <= 0.75 + 0.5*(1/12),]
-    
-    slec$agevac <- decimal_date(slec$date_m1) - decimal_date(slec$dob)
-    slec$vac_on_date1 <- ifelse(slec$agevac < slec$ageuntil + 1/12,1,0)
-    slec$vac_on_date1 <- replace(slec$vac_on_date, is.na(slec$vac_on_date1),0)
-    
-    re <- slec %>% group_by(vac_on_date1) %>% count()  
-    
-    if(nrow(re) == 1){
-      re[2,] <- re[1,]
-      re[1,1] <- 0  
-      re[1,2] <- 0  
-    } 
-    
-    cus <- data.frame(district = district[k],
-                      date = week[i],
-                      per = as.numeric(re[2,2])/(as.numeric(re[2,2])+as.numeric(re[1,2])))
-    out_timely <- rbind(out_timely,cus)
-  }
-}
-```
-
-```{r}
-time_vac <- out_timely %>% mutate(dis = factor(district, levels = as.character(sorted$district))) %>% 
-  ggplot(aes(x = date,y = per*100))+
-  geom_line()+
-  # scale_y_continuous(limits = c(50, 100), breaks = seq(50,100,by = 10)) +
-  labs(x = "Date",y = "Timely vaccination percentage (%)")+
-  scale_x_date(breaks = "2 months",
-               date_labels= "%b %Y")+
-  facet_wrap(vars(dis),ncol = 1)+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle = 45,size = 8,
-                                   hjust=1))
-
-```
-
-# IPSUM analysis
-
-```{r}
-#| code-fold: true
-#| echo: true
-
+###
 ipsum <- read_csv("data/GEO1_VN2019_79.csv")
+
+colnames(ipsum)
+
 
 ipsum$district <- case_when(
   ipsum$GEO2_VN == 704079760 ~ "Quận 1",
@@ -281,6 +214,7 @@ ipsum$district <- case_when(
   trimws(which = "both")
 
 ## census for denominator
+
 hcm19 <- readRDS("D:/OUCRU/hfmd/data/census2019.rds") %>% 
   filter(province == "Thành phố Hồ Chí Minh")
 
@@ -295,12 +229,8 @@ popdis <- hcm19 %>% group_by(district) %>%
   summarise(n = sum(n))
 
 districtc <- popdis$district
-```
 
-```{r}
-#| code-fold: true
-#| echo: true
-## function to calculate percentage of each district
+## demographic data
 scale_per <- function(data){
   ou <- data.frame()
   for (i in 1:22){
@@ -311,11 +241,7 @@ scale_per <- function(data){
   }
   return(ou)
 }
-```
 
-```{r}
-#| code-fold: true
-#| echo: true
 ## Level of education or training currently attending
 ipsum$edu <-  case_when(
   ipsum$VN2019A_SCHOOLLEV == 99 ~ "NIU",
@@ -359,8 +285,8 @@ edu <- scale_per(hcm_edu) %>% filter(edu != "NIU") %>%
   labs(x = "Percentage of total population(%)",
        y = "Education")+
   theme_light()+
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 8)) 
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
 
 ## Employment status
 ipsum$employ <-  case_when(
@@ -384,7 +310,7 @@ employ <- scale_per(hcm_employ) %>% filter(employ != "NIU") %>%
                       levels = as.character(sorted$district))) %>% 
   ggplot() +
   geom_col(aes(x = per,
-               y = employ)) +
+               y = edu)) +
   facet_wrap(vars(dis),
              # scales = "free",
              ncol = 1)+
@@ -403,6 +329,20 @@ ipsum$son_in_house <-  ifelse(ipsum$son_in_house == "0","None",
 
 hcm_sih <- ipsum %>% group_by(district,son_in_house) %>% count()
 
+scale_per(hcm_sih) %>% filter(son_in_house != "NIU") %>% 
+  mutate(dis = factor(district,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = son_in_house)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Number of sons living in household")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15))
 
 ##Number of daughter living in household
 ipsum$dau_in_house <- as.character(ipsum$VN2019A_CHHOMEF)
@@ -413,6 +353,20 @@ ipsum$dau_in_house <-  ifelse(ipsum$dau_in_house == "0","None",
 
 hcm_dih <- ipsum %>% group_by(district,dau_in_house) %>% count()
 
+scale_per(hcm_dih) %>% filter(dau_in_house != "NIU") %>% 
+  mutate(dis = factor(district,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = dau_in_house)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Number of sons living in household")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15))
 
 son_dau <- full_join(scale_per(hcm_sih) %>% select(district,son_in_house,per),
           scale_per(hcm_dih) %>% select(district,dau_in_house,per),
@@ -439,7 +393,7 @@ pop_range <- range(hcm_childa$per2 %>% na.omit())
 
 pop_range_breaks <- pretty(pop_range, n = 6)
 
-chil <- hcm_child %>% filter(num_child != "NIU") %>% 
+hcm_chil <- hcm_child %>% filter(num_child != "NIU") %>% 
   mutate(dis = factor(district,
                       levels = as.character(sorted$district))) %>% 
   ggplot() +
@@ -452,10 +406,11 @@ chil <- hcm_child %>% filter(num_child != "NIU") %>%
              # scales = "free",
              ncol = 1)+
   theme_light()+
-  labs(x = "Percentage of total population(%)",
-       y = "Number of children")
+  labs(x = "Percentage (%)",y = "Number of children")
 
 ## Faith or religion
+ipsum$VN2019A_RELIG2 %>% unique()
+
 ipsum$reli <-  case_when(
   ipsum$VN2019A_RELIG2 == 99 ~ "NIU",
   ipsum$VN2019A_RELIG2 == 1 ~ "Buddhism",
@@ -500,109 +455,13 @@ reli <- scale_per(hcm_reli) %>% filter(reli != "NIU" & per >=0.1) %>%
              # scales = "free",
              ncol = 1)+
   labs(x = "Percentage of total population(%)",
-       y = "Religion")+
+       y = "Education")+
   theme_light()+
   theme(axis.text.x = element_text(size = 15),
         axis.text.y = element_text(size = 15)) 
-```
-
-# Vaccination delay in Ho Chi Minh city
-
-```{r}
-#| code-fold: true
-#| echo: true
-# Delay distribution
-
-dttlv$date_m1_ontime <- dttlv$dob %m+% months(9)
-dttlv$delay <- interval(dttlv$date_m1_ontime,dttlv$date_m1) / months(1)
 
 
-## Delay distribution of HCMC
-
-
-dttlv %>% na.omit() %>% 
-  filter(delay > 0 & date_m1_ontime >= as.Date("2022-05-01")
-         & date_m1_ontime <= as.Date("2023-12-31")) %>% 
-  ggplot(aes(x=delay)) +
-  geom_density()+
-  labs(x = "Month")
-
-
-## Each districts with demographic variables
-meandl <- dttlv %>% na.omit() %>% 
-  filter(delay > 0 & date_m1_ontime >= as.Date("2022-05-01")
-         & date_m1_ontime <= as.Date("2023-12-31")) %>% 
-  group_by(district) %>% 
-  summarise(median = median(delay,na.rm = T)) 
-
-vac_dl <- dttlv %>% 
-  mutate(dis = factor(district, 
-                      levels = as.character(sorted$district))) %>% 
-  filter(delay > 0 & date_m1_ontime >= as.Date("2022-05-01")
-         & date_m1_ontime <= as.Date("2023-12-31")) %>% 
-  ggplot(aes(x=delay)) +
-  geom_density()+
-  labs(x = "Month")+
-  xlim(0,5)+
-  facet_wrap(vars(dis),ncol = 1)+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle = 45,size = 8,
-                                   hjust=1)) 
-##
-month <- seq(as.Date("2022-05-01"),as.Date("2024-01-01"),by = "month")
-dis2 <- dttlv$district %>% unique()
-uot <- data.frame()
-uot2 <- data.frame()
-for (k in 1:length(dis2)){
-  dtd <- dttlv %>% filter(district == dis2[k])
-  for (i in 1:(length(month)-1)){
-    emon <- dtd %>% na.omit() %>% 
-      filter(date_m1_ontime >= month[i] & 
-               date_m1_ontime <= month[i+1] &
-               delay > 0)
-    uot2 <- data.frame(district = dis2[k],
-                       month = month[i],
-                       del = median(emon$delay)) 
-    uot <- rbind(uot,uot2)
-  }  
-}
-
-month_delay <- uot %>% 
-  mutate(dis = factor(district, 
-                      levels = as.character(sorted$district))) %>%
-  ggplot(aes(x = month,y=del)) +
-  geom_bar(stat = "identity")+
-  labs(x = "Month", y = "The median of delayed month")+
-  facet_wrap(vars(dis),ncol = 1)+
-  scale_x_date(breaks = "2 months",
-               date_labels= "%b %Y")+
-  theme_bw()+
-  theme(axis.text.x = element_text(angle = 45,size = 8,
-                                   hjust=1)) 
-
-```
-
-
-# Vaccine coverage and variables 
-
-```{r}
-#| code-fold: true
-#| echo: true
-#| fig-width: 30
-#| fig-height: 30
-#| out-width: "100%"
-
-vac_cov | time_vac | vac_dl | month_delay | edu | employ | reli | chil  
-```
-
-# Nestedness analysis of economical variable
-
-```{r}
-#| fig-width: 15
-#| fig-height: 10
-#| fig-format: png
-#| code-fold: true
-#| echo: true
+## economic variables
 
 ipsum$tv <- ifelse(ipsum$VN2019A_TV == 1,1,0)
 ipsum$radio <- ifelse(ipsum$VN2019A_RADIO == 1,1,0)
@@ -617,13 +476,73 @@ ipsum$bicycle <- ifelse(ipsum$VN2019A_BIKE == 1,1,0)
 ipsum$car <- ifelse(ipsum$VN2019A_CAR == 1,1,0)
 
 wealth_index <- ipsum[,c("district","tv","radio","computer","phone",
-                      "refrig","washer","watheat","aircon","motorcyc",
-                      "bicycle","car")] 
+                         "refrig","washer","watheat","aircon","motorcyc",
+                         "bicycle","car")] 
 
 d1 <- nestedtemp(wealth_index[,-1])
 
 plot(d1, kind="incid",names = TRUE,ylab="",yaxt="n",las=1)
-```
 
+
+
+ipsum$VN2019A_BEDROOMS %>% unique()
+
+
+## q1: phone motorcyc tv refrig washer
+## q2: phone motorcyc tv refrig washer computer aircon
+## q3: phone motorcyc tv refrig washer computer aircon watheat bicycle
+## q4: phone motorcyc tv refrig washer computer aircon watheat bicycle radio car
+
+wealth_index <- wealth_index %>% 
+  mutate(quantile = 
+   case_when((washer == 1) ~ "q1",
+             (aircon == 1) ~ "q2",
+             (bicycle == 1) ~ "q3",
+             (car == 1) ~ "q4"))  
+
+wealth_index$quantile <- replace(wealth_index$quantile, 
+                                 is.na(wealth_index$quantile), "q1")
+
+scale_per <- function(data){
+  ou <- data.frame()
+  for (i in 1:22){
+    oo <- data %>% filter(district == districtc[i]) %>% 
+      mutate(pop = rep(as.numeric(popdis$n[popdis$district == districtc[i]])),
+             per = (n/pop)*100)
+    ou <- rbind(ou,oo)
+  }
+  return(ou)
+}
+
+scale_per(wealth_index) %>% 
+  mutate(dis = factor(district,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = reli)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
+wealth_index %>% group_by(district) %>% 
+  count(quantile) %>% scale_per() %>% 
+  mutate(dis = factor(district,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = quantile)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 5)+
+  labs(x = "Percentage of total population(%)",
+       y = "Education")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
 
 

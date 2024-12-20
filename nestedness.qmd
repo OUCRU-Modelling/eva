@@ -72,4 +72,3 @@ d1 <- nestedtemp(wealth_index[,-1])
 
 plot(d1, kind="incid",names = TRUE,ylab="",yaxt="n",las=1)
 ```
-
