@@ -794,7 +794,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>ipsum<span class="sc">$</span>bicycle <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ipsum<span class="sc">$</span>VN2019A_BIKE <span class="sc">==</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>ipsum<span class="sc">$</span>car <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(ipsum<span class="sc">$</span>VN2019A_CAR <span class="sc">==</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>wealth_index <span class="ot">&lt;-</span> ipsum[,<span class="fu">c</span>(<span class="st">"district"</span>,<span class="st">"tv"</span>,<span class="st">"radio"</span>,<span class="st">"computer"</span>,<span class="st">"phone"</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>wealth_index <span class="ot">&lt;-</span> ipsum[,<span class="fu">c</span>(<span class="st">"district"</span>,<span class="st">"tv"</span>,<span class="st">"computer"</span>,<span class="st">"phone"</span>,</span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"refrig"</span>,<span class="st">"washer"</span>,<span class="st">"watheat"</span>,<span class="st">"aircon"</span>,<span class="st">"motorcyc"</span>,</span>
 <span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"bicycle"</span>,<span class="st">"car"</span>)] </span>
 <span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
@@ -804,6 +804,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 <div class="cell-output-display">
 <p><img src="vac_cov_files/figure-html/unnamed-chunk-13-1.png" style="width:100.0%;height:100.0%"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## rearrange column follow the order of nestedness analysis </span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>wealth_index <span class="ot">&lt;-</span> ipsum[,<span class="fu">c</span>(<span class="st">"district"</span>,<span class="st">"phone"</span>,<span class="st">"motorcyc"</span>,<span class="st">"tv"</span>,<span class="st">"refrig"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"washer"</span>,<span class="st">"computer"</span>,<span class="st">"aircon"</span>,<span class="st">"watheat"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"bicycle"</span>,<span class="st">"car"</span>)] </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="do">## select the highest property of each individual </span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>wealth_index <span class="ot">&lt;-</span> <span class="fu">cbind</span>(wealth_index[,<span class="dv">1</span>],</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                      wealth_index[,<span class="sc">-</span><span class="dv">1</span>] <span class="sc">%&gt;%</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span>(<span class="at">highest_property =</span> <span class="fu">names</span>(.)[<span class="fu">max</span>(<span class="fu">which</span>(<span class="fu">c_across</span>(<span class="fu">everything</span>()) <span class="sc">==</span> <span class="dv">1</span>))]) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">ungroup</span>()) <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>wealth_index<span class="sc">$</span>quantile  <span class="ot">&lt;-</span>  </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>           <span class="fu">case_when</span>(wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"car"</span> <span class="sc">~</span> <span class="st">"Richest, 25%"</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"bicycle"</span> <span class="sc">|</span> </span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"watheat"</span> <span class="sc">|</span> </span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"aircon"</span>  <span class="sc">~</span> <span class="st">"Middle, 25%"</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"washer"</span> <span class="sc">|</span> </span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"refrig"</span><span class="sc">|</span> </span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"computer"</span>  <span class="sc">~</span> <span class="st">"Lower Middle, 25%"</span>,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"phone"</span> <span class="sc">|</span> </span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"motorcyc"</span> <span class="sc">|</span> </span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                     wealth_index<span class="sc">$</span>highest_property <span class="sc">==</span> <span class="st">"tv"</span>   <span class="sc">~</span> <span class="st">"Poorest, 25%"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>           <span class="fu">factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Richest, 25%"</span>,</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Middle, 25%"</span>,</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Lower Middle, 25%"</span>,</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Poorest, 25%"</span>)</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>wealth <span class="ot">&lt;-</span> wealth_index <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(district) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(quantile) <span class="sc">%&gt;%</span> <span class="fu">scale_per</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dis =</span> <span class="fu">factor</span>(district,</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">as.character</span>(sorted<span class="sc">$</span>district))) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> per,</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> quantile)) <span class="sc">+</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(dis),</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>             <span class="co"># scales = "free",</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Percentage of total population(%)"</span>,</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Wealth Quantile"</span>)<span class="sc">+</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()<span class="sc">+</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>vac_cov <span class="sc">|</span> time_vac <span class="sc">|</span> vac_dl <span class="sc">|</span> month_delay <span class="sc">|</span> wealth <span class="sc">|</span>edu <span class="sc">|</span> employ <span class="sc">|</span> reli <span class="sc">|</span> chil  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="vac_cov_files/figure-html/unnamed-chunk-15-1.svg" style="width:100.0%;height:100.0%"></p>
 </div>
 </div>
 

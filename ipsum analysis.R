@@ -475,7 +475,7 @@ ipsum$motorcyc <- ifelse(ipsum$VN2019A_MOTORCYC == 1,1,0)
 ipsum$bicycle <- ifelse(ipsum$VN2019A_BIKE == 1,1,0)
 ipsum$car <- ifelse(ipsum$VN2019A_CAR == 1,1,0)
 
-wealth_index <- ipsum[,c("district","tv","radio","computer","phone",
+wealth_index <- ipsum[,c("district","tv","computer","phone",
                          "refrig","washer","watheat","aircon","motorcyc",
                          "bicycle","car")] 
 
@@ -493,15 +493,30 @@ ipsum$VN2019A_BEDROOMS %>% unique()
 ## q3: phone motorcyc tv refrig washer computer aircon watheat bicycle
 ## q4: phone motorcyc tv refrig washer computer aircon watheat bicycle radio car
 
+
+## rearrange 
+
+wealth_index <- ipsum[,c("district","phone","motorcyc","tv","refrig",
+                         "washer","computer","aircon","watheat",
+                         "bicycle","car")] 
+
+wealth_index <- cbind(wealth_index[,1],
+                      wealth_index[,-1] %>%
+                        rowwise() %>%
+                        mutate(highest_poverty = names(.)[max(which(c_across(everything()) == 1))]) %>%
+                        ungroup()) %>% na.omit()
+
 wealth_index <- wealth_index %>% 
   mutate(quantile = 
-   case_when((washer == 1) ~ "q1",
-             (aircon == 1) ~ "q2",
-             (bicycle == 1) ~ "q3",
-             (car == 1) ~ "q4"))  
+           case_when(highest_poverty == "car" ~ "q4",
+                     highest_poverty == "bicycle" | highest_poverty == "watheat" | 
+                     highest_poverty == "aircon"  ~ "q3",
+                     highest_poverty == "washer" | highest_poverty == "refrig"| 
+                     highest_poverty == "computer"  ~ "q2",
+                     highest_poverty == "phone" | highest_poverty == "motorcyc" | 
+                     highest_poverty == "tv"   ~ "q1")
+         ) 
 
-wealth_index$quantile <- replace(wealth_index$quantile, 
-                                 is.na(wealth_index$quantile), "q1")
 
 scale_per <- function(data){
   ou <- data.frame()
@@ -514,20 +529,7 @@ scale_per <- function(data){
   return(ou)
 }
 
-scale_per(wealth_index) %>% 
-  mutate(dis = factor(district,
-                      levels = as.character(sorted$district))) %>% 
-  ggplot() +
-  geom_col(aes(x = per,
-               y = reli)) +
-  facet_wrap(vars(dis),
-             # scales = "free",
-             ncol = 1)+
-  labs(x = "Percentage of total population(%)",
-       y = "Education")+
-  theme_light()+
-  theme(axis.text.x = element_text(size = 15),
-        axis.text.y = element_text(size = 15)) 
+
 
 wealth_index %>% group_by(district) %>% 
   count(quantile) %>% scale_per() %>% 
@@ -544,5 +546,6 @@ wealth_index %>% group_by(district) %>%
   theme_light()+
   theme(axis.text.x = element_text(size = 15),
         axis.text.y = element_text(size = 15)) 
+
 
 

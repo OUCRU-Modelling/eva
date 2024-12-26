@@ -616,7 +616,7 @@ ipsum$motorcyc <- ifelse(ipsum$VN2019A_MOTORCYC == 1,1,0)
 ipsum$bicycle <- ifelse(ipsum$VN2019A_BIKE == 1,1,0)
 ipsum$car <- ifelse(ipsum$VN2019A_CAR == 1,1,0)
 
-wealth_index <- ipsum[,c("district","tv","radio","computer","phone",
+wealth_index <- ipsum[,c("district","tv","computer","phone",
                       "refrig","washer","watheat","aircon","motorcyc",
                       "bicycle","car")] 
 
@@ -626,4 +626,64 @@ plot(d1, kind="incid",names = TRUE,ylab="",yaxt="n",las=1)
 ```
 
 
+```{r}
+#| code-fold: true
+#| echo: true
 
+## rearrange column follow the order of nestedness analysis 
+
+wealth_index <- ipsum[,c("district","phone","motorcyc","tv","refrig",
+                         "washer","computer","aircon","watheat",
+                         "bicycle","car")] 
+
+## select the highest property of each individual 
+wealth_index <- cbind(wealth_index[,1],
+                      wealth_index[,-1] %>%
+                        rowwise() %>%
+                        mutate(highest_property = names(.)[max(which(c_across(everything()) == 1))]) %>%
+                        ungroup()) %>% na.omit()
+
+wealth_index$quantile  <-  
+           case_when(wealth_index$highest_property == "car" ~ "Richest, 25%",
+                     wealth_index$highest_property == "bicycle" | 
+                     wealth_index$highest_property == "watheat" | 
+                     wealth_index$highest_property == "aircon"  ~ "Middle, 25%",
+                     wealth_index$highest_property == "washer" | 
+                     wealth_index$highest_property == "refrig"| 
+                     wealth_index$highest_property == "computer"  ~ "Lower Middle, 25%",
+                     wealth_index$highest_property == "phone" | 
+                     wealth_index$highest_property == "motorcyc" | 
+                     wealth_index$highest_property == "tv"   ~ "Poorest, 25%") %>% 
+           factor(levels = c("Richest, 25%",
+                             "Middle, 25%",
+                             "Lower Middle, 25%",
+                             "Poorest, 25%")
+                    )
+
+wealth <- wealth_index %>% group_by(district) %>% 
+  count(quantile) %>% scale_per() %>% 
+  mutate(dis = factor(district,
+                      levels = as.character(sorted$district))) %>% 
+  ggplot() +
+  geom_col(aes(x = per,
+               y = quantile)) +
+  facet_wrap(vars(dis),
+             # scales = "free",
+             ncol = 1)+
+  labs(x = "Percentage of total population(%)",
+       y = "Wealth Quantile")+
+  theme_light()+
+  theme(axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15)) 
+
+```
+
+```{r}
+#| code-fold: true
+#| echo: true
+#| fig-width: 30
+#| fig-height: 30
+#| out-width: "100%"
+
+vac_cov | time_vac | vac_dl | month_delay | wealth |edu | employ | reli | chil  
+```
