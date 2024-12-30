@@ -16,9 +16,7 @@ book:
   title: "Equity in Vaccine Access in Ho Chi Minh City"
   chapters:
     - index.qmd
-    - vac_cov.qmd
     - ipsum.qmd
-    - nestedness.qmd
     
     
 format:
